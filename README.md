@@ -1,5 +1,38 @@
 # Instantboard API Server
 
+## Getting started
+
+```
+# initialize
+$ npm run db:create
+$ npm run db:migrate
+
+$ npm run dev
+```
+
+## Test
+
+```
+# initialize
+$ npm run db:create
+$ NODE_ENV=test npm run db:migrate
+
+# run test
+$ npm test
+```
+
+## E2E Test
+
+```
+# initialize
+$ npm run db:create
+$ NODE_ENV=test npm run db:migrate
+
+# run test
+$ NODE_ENV=test npm run dev
+$ npm run test:e2e
+```
+
 ## Database
 
 - users(id / uid / provider / username / created_at / updated_at)
@@ -38,25 +71,3 @@
       - `/:id` PUT: update request
       - `/:id` DELETE: delete request
 
-## Test
-
-```
-# initialize
-$ npm run db:create
-$ NODE_ENV=test npm run db:migrate
-
-# run test
-$ npm test
-```
-
-## E2E Test
-
-```
-# initialize
-$ npm run db:create
-$ NODE_ENV=test npm run db:migrate
-
-# run test
-$ NODE_ENV=test npm run dev
-$ npm run test:e2e
-```
