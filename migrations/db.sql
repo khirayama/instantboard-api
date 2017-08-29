@@ -1,0 +1,2 @@
+CREATE DATABASE instantboard_database_development;
+CREATE DATABASE instantboard_database_test;
