@@ -2,3 +2,4 @@
 
 /node_modules
 /sequelize-meta.json
+/.envrc
