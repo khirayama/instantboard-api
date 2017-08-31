@@ -1,16 +1,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const jwt = require('jwt-simple');
+const passport = require('passport');
+const FacebookStrategy = require('passport-facebook').Strategy;
+
 const {User} = require('./models');
 
 const {
   extractAccessTokenFromHeader,
   checkAccessToken,
 } = require('./utils');
-
-const {
-  createTokenHandler,
-} = require('./handlers/token-handlers');
 
 const {
   validUserHandler,
@@ -47,8 +47,64 @@ const {
 
 const app = express();
 
-const port = process.env.PORT || 3000;
-const host = process.env.HOST || '127.0.0.1';
+const SECRET_KEY = process.env.SECRET_KEY;
+
+const API_SERVER_PORT = process.env.API_SERVER_PORT;
+const API_SERVER_HOSTNAME = process.env.API_SERVER_HOSTNAME;
+const API_SERVER_HOST = `http://${API_SERVER_HOSTNAME}:${API_SERVER_PORT}`;
+
+const APP_SERVER_PORT = process.env.APP_SERVER_PORT;
+const APP_SERVER_HOSTNAME = process.env.APP_SERVER_HOSTNAME;
+const APP_SERVER_HOST = `http://${APP_SERVER_HOSTNAME}:${APP_SERVER_PORT}`;
+
+passport.use(
+  new FacebookStrategy({
+    clientID: process.env.FACEBOOK_CLIENT_ID,
+    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    callbackURL: `${API_SERVER_HOST}/auth/facebook/callback`,
+  }, (accessToken, refreshToken, profile, done) => {
+    const provider = 'facebook';
+    const uid = profile.id;
+    const username = `${provider}-${uid}`;
+
+    User.findOrCreate({
+      where: {provider, uid},
+      defaults: {provider, uid, username},
+    }).spread(user => {
+      const now = new Date();
+      const expires = now.setYear(now.getFullYear() + 3);
+
+      // Ref: [JA] https://hiyosi.tumblr.com/post/70073770678/jwt%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E7%B0%A1%E5%8D%98%E3%81%AB%E3%81%BE%E3%81%A8%E3%82%81%E3%81%A6%E3%81%BF%E3%81%9F
+      const token = jwt.encode({
+        sub: user.id,
+        exp: expires,
+        iat: now.getTime(),
+      }, SECRET_KEY);
+
+      done(null, {token});
+    });
+  })
+);
+
+app.get('/auth/:provider', (req, res, next) => {
+  const provider = req.params.provider;
+
+  passport.authenticate(provider, {
+    session: false,
+    scope: [],
+  })(req, res, next);
+});
+
+app.get('/auth/:provider/callback', (req, res, next) => {
+  const provider = req.params.provider;
+
+  passport.authenticate(provider, {
+    session: false,
+  }, (err, user, info) => {
+    const token = user.token;
+    res.redirect(`${APP_SERVER_HOST}/login?token=${token}`);
+  })(req, res, next);
+});
 
 function requireAuthorization(req, res, next) {
   const accessToken = extractAccessTokenFromHeader(req.headers.authorization);
@@ -76,9 +132,6 @@ const router = new express.Router('');
 
 router.use('/api', new express.Router()
   .use('/v1', new express.Router()
-    .use('/tokens', new express.Router()
-      .post('/', createTokenHandler)
-    )
     .use('/users', new express.Router()
       .get('/valid', [requireAuthorization], validUserHandler)
       .get('/current', [requireAuthorization], showCurrentUserHandler)
@@ -116,13 +169,14 @@ router.use('/api', new express.Router()
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Origin', APP_SERVER_HOST);
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  // res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header('Access-Control-Allow-Methods', 'PUT, DELETE');
   next();
 });
 app.use(router);
 
 // Main
-console.log('Example app listening on port 3000!');
-app.listen(port, host);
+console.log(`Start api app at ${new Date()} on ${API_SERVER_HOST}`);
+app.listen(API_SERVER_PORT);
