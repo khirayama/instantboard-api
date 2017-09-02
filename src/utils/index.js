@@ -1,6 +1,6 @@
 const jwt = require('jwt-simple');
 
-const {SECRET_KEY} = require('../constants');
+const SECRET_KEY = process.env.SECRET_KEY;
 
 function extractAccessTokenFromHeader(authorizationString = '') {
   return authorizationString.replace(/^Bearer/, '').trim();
