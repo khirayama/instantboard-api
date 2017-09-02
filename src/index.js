@@ -100,7 +100,11 @@ app.get('/auth/:provider/callback', (req, res, next) => {
 
   passport.authenticate(provider, {
     session: false,
-  }, (err, user, info) => {
+  }, (err, user) => {
+    if (err !== null) {
+      res.redirect(`${APP_SERVER_HOST}/login`);
+    }
+
     const token = user.token;
     res.redirect(`${APP_SERVER_HOST}/login?token=${token}`);
   })(req, res, next);
