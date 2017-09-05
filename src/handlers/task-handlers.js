@@ -61,7 +61,6 @@ function updateTaskHandler(req, res) {
   const labelId = req.body.labelId;
   const content = req.body.content;
   const completed = req.body.completed;
-  const priority = req.body.priority;
 
   Task.findById(taskId).then(task => {
     if (labelId && labelId !== String(task.labelId)) {
@@ -99,7 +98,6 @@ function updateTaskHandler(req, res) {
       task.update({
         content: (content === undefined) ? task.content : content,
         completed: (completed === undefined) ? task.completed : completed,
-        priority: (priority === undefined) ? task.priority : priority,
       }).then(task_ => {
         res.json(_transformTask(task_));
       });
