@@ -61,9 +61,10 @@ function updateTaskHandler(req, res) {
   const labelId = req.body.labelId;
   const content = req.body.content;
   const completed = req.body.completed;
+  const priority = req.body.priority;
 
   Task.findById(taskId).then(task => {
-    if (labelId && labelId !== task.labelId) {
+    if (labelId && labelId !== String(task.labelId)) {
       Promise.all([
         Task.count({
           where: {userId, labelId},
@@ -98,6 +99,7 @@ function updateTaskHandler(req, res) {
       task.update({
         content: (content === undefined) ? task.content : content,
         completed: (completed === undefined) ? task.completed : completed,
+        priority: (priority === undefined) ? task.priority : priority,
       }).then(task_ => {
         res.json(_transformTask(task_));
       });
@@ -140,6 +142,7 @@ function sortTaskHandler(req, res) {
       Task.findAll({
         where: {
           userId,
+          labelId: task.labelId,
           priority: {
             $gt: task.priority,
             $lte: priority,
@@ -162,6 +165,7 @@ function sortTaskHandler(req, res) {
       Task.findAll({
         where: {
           userId,
+          labelId: task.labelId,
           priority: {
             $gte: priority,
             $lt: task.priority,
@@ -179,6 +183,13 @@ function sortTaskHandler(req, res) {
             res.json(tasks_.map(_transformTask));
           });
         });
+      });
+    } else {
+      Task.findAll({
+        where: {userId},
+        order: [['priority', 'ASC']],
+      }).then(tasks_ => {
+        res.json(tasks_.map(_transformTask));
       });
     }
   });
