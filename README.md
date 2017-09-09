@@ -35,7 +35,7 @@ $ npm run test:e2e
 
 ## Database
 
-- users(id / uid / provider / username / created_at / updated_at)
+- users(id / uid / provider / name / created_at / updated_at)
 - labels(id / user_id / name / created_at / updated_at)
 - label_statuses(id / user_id / label_id / priority / visibled)
 - tasks(id / user_id / label_id / content / priority / completed / created_at / updated_at)

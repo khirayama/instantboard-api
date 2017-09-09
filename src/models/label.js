@@ -7,12 +7,12 @@ function _getMembers(label, requests, users) {
         const user = users[k];
         if (user.id === request.memberId) {
           requests_.push({
-            name: user.username,
+            name: user.name,
             status: request.status,
           });
         } else if (user.id === label.userId) {
           requests_.push({
-            name: user.username,
+            name: user.name,
             status: 'accepted',
           });
         }

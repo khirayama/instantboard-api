@@ -41,7 +41,7 @@ function indexRequestHandler(req, res) {
         };
         users.forEach(user => {
           if (request.userId === user.id) {
-            request_.memberName = user.username;
+            request_.memberName = user.name;
           }
         });
         labels.forEach(label => {
@@ -81,7 +81,7 @@ function createRequestHandler(req, res) {
   } else if (memberName) {
     User.findOne({
       where: {
-        username: memberName,
+        name: memberName,
       },
     }).then(user => {
       Request.findOrCreate({

@@ -65,11 +65,11 @@ passport.use(
   }, (accessToken, refreshToken, profile, done) => {
     const provider = 'facebook';
     const uid = profile.id;
-    const username = `${provider}-${uid}`;
+    const name = `${provider}-${uid}`;
 
     User.findOrCreate({
       where: {provider, uid},
-      defaults: {provider, uid, username},
+      defaults: {provider, uid, name},
     }).spread(user => {
       const now = new Date();
       const expires = now.setYear(now.getFullYear() + 3);
@@ -122,6 +122,13 @@ function requireAuthorization(req, res, next) {
   }
 
   User.findById(payload.sub).then(user => {
+    if (user === null) {
+      res.status(401).send({
+        error: 'Invalid access token.',
+      });
+    }
+    return;
+
     req.user = user;
     req.isAuthenticated = true;
     next();

@@ -1,11 +1,11 @@
 const memberResponseSchema = {
   type: 'object',
-  required: ['id', 'username', 'requestStatus'],
+  required: ['id', 'name', 'requestStatus'],
   properties: {
     id: {
       type: 'number',
     },
-    username: {
+    name: {
       type: 'string',
     },
     requestStatus: {

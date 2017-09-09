@@ -19,13 +19,13 @@ test.cb('showCurrentUserHandler > work without error', t => {
 
   res.on(user => {
     t.is(user.id, req.user.id);
-    t.is(user.username, 'test user');
+    t.is(user.name, 'test user');
     t.end();
   });
 
   req.user = {
     id: uuid(),
-    username: 'test user',
+    name: 'test user',
   };
 
   showCurrentUserHandler(req, res);
@@ -45,13 +45,13 @@ test.cb('showCurrentUserHandler > work with error', t => {
   showCurrentUserHandler(req, res);
 });
 
-test.cb('updateCurrentUserHandler > set username without error', t => {
+test.cb('updateCurrentUserHandler > set name without error', t => {
   const req = createRequest();
   const res = createResponse();
 
   res.on(user => {
     t.is(user.id, req.user.id);
-    t.is(user.username, req.body.username);
+    t.is(user.name, req.body.name);
     t.end();
   });
 
@@ -60,13 +60,13 @@ test.cb('updateCurrentUserHandler > set username without error', t => {
     provider: 'facebook',
   }).then(user => {
     req.user = user.dataValues;
-    req.body.username = `test user ${uuid()}`;
+    req.body.name = `test user ${uuid()}`;
 
     updateCurrentUserHandler(req, res);
   });
 });
 
-test.cb('updateCurrentUserHandler > set username with error', t => {
+test.cb('updateCurrentUserHandler > set name with error', t => {
   const req = createRequest();
   const res = createResponse();
 
@@ -79,7 +79,7 @@ test.cb('updateCurrentUserHandler > set username with error', t => {
 
   User.bulkCreate([{
     uid,
-    username: `test user ${uid}`,
+    name: `test user ${uid}`,
     provider: 'facebook',
   }, {
     uid: uuid(),
@@ -88,7 +88,7 @@ test.cb('updateCurrentUserHandler > set username with error', t => {
     individualHooks: true,
   }).then(users => {
     req.user = users[1].dataValues;
-    req.body.username = `test user ${uid}`;
+    req.body.name = `test user ${uid}`;
 
     updateCurrentUserHandler(req, res);
   });

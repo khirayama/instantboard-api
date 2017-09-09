@@ -4,17 +4,17 @@ const {User, Request, LabelStatus} = require('../models');
 function _transformUser(user) {
   return {
     id: user.id,
-    username: user.username,
+    name: user.name,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
 }
 
 function validUserHandler(req, res) {
-  const username = req.query.username;
+  const name = req.query.name;
 
   User.findOne({
-    where: {username},
+    where: {name},
   }).then(user => {
     if (user) {
       const message = errorMessages.ALREADY_EXISTED_USER;
@@ -39,9 +39,9 @@ function showCurrentUserHandler(req, res) {
 
 function updateCurrentUserHandler(req, res) {
   const user = req.user || null;
-  const username = req.body.username;
+  const name = req.body.name;
 
-  User.update({username}, {
+  User.update({name}, {
     where: {id: user.id},
     individualHooks: true,
   }).spread((count, users) => {
@@ -51,7 +51,7 @@ function updateCurrentUserHandler(req, res) {
     let code = 500;
     let message = errorMessages.UNKNOWN_ERROR;
 
-    if (err.errors && err.errors[0].message === 'username must be unique') {
+    if (err.errors && err.errors[0].message === 'name must be unique') {
       code = 400;
       message = errorMessages.ALREADY_EXISTED_USER;
     }
