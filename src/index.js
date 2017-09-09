@@ -126,8 +126,8 @@ function requireAuthorization(req, res, next) {
       res.status(401).send({
         error: 'Invalid access token.',
       });
+      return;
     }
-    return;
 
     req.user = user;
     req.isAuthenticated = true;
