@@ -13,7 +13,7 @@ const {
 } = require('./utils');
 
 const {
-  validUserHandler,
+  existUserHandler,
   showCurrentUserHandler,
   updateCurrentUserHandler,
   destroyCurrentUserHandler,
@@ -144,7 +144,7 @@ const router = new express.Router('');
 router.use('/api', new express.Router()
   .use('/v1', new express.Router()
     .use('/users', new express.Router()
-      .get('/valid', [requireAuthorization], validUserHandler)
+      .get('/exist', [requireAuthorization], existUserHandler)
       .get('/current', [requireAuthorization], showCurrentUserHandler)
       .put('/current', [requireAuthorization], updateCurrentUserHandler)
       .delete('/current', [requireAuthorization], destroyCurrentUserHandler)

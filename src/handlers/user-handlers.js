@@ -10,7 +10,7 @@ function _transformUser(user) {
   };
 }
 
-function validUserHandler(req, res) {
+function existUserHandler(req, res) {
   const name = req.query.name;
 
   User.findOne({
@@ -18,9 +18,9 @@ function validUserHandler(req, res) {
   }).then(user => {
     if (user) {
       const message = errorMessages.ALREADY_EXISTED_USER;
-      res.json({isValid: false, message});
+      res.json({exist: true, message});
     } else {
-      res.json({isValid: true, message: null});
+      res.json({exist: false, message: null});
     }
   });
 }
@@ -103,7 +103,7 @@ function indexMemberHandler(req, res) {
 }
 
 module.exports = {
-  validUserHandler,
+  existUserHandler,
   showCurrentUserHandler,
   updateCurrentUserHandler,
   destroyCurrentUserHandler,
