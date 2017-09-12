@@ -150,6 +150,7 @@ module.exports = (sequelize, DataTypes) => {
   Label.createWithStatus = function (values) {
     // Property: userId, name
     const LabelStatus = sequelize.models.LabelStatus;
+    const Request = sequelize.models.Request;
 
     return new Promise(resolve => {
       Promise.all([
@@ -175,6 +176,12 @@ module.exports = (sequelize, DataTypes) => {
           Label.findByIdAndUser(label.id, values.userId).then(label_ => {
             resolve(label_);
           });
+        });
+        Request.create({
+          userId: values.userId,
+          memberId: values.userId,
+          labelId: label.id,
+          status: 'accepted',
         });
       });
     });
