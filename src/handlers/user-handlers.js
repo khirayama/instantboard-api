@@ -10,18 +10,13 @@ function _transformUser(user) {
   };
 }
 
-function existUserHandler(req, res) {
-  const name = req.query.name;
+function fetchUserHandler(req, res) {
+  const query = req.query;
 
-  User.findOne({
-    where: {name},
-  }).then(user => {
-    if (user) {
-      const message = errorMessages.ALREADY_EXISTED_USER;
-      res.json({exist: true, message});
-    } else {
-      res.json({exist: false, message: null});
-    }
+  User.findAll({
+    where: query,
+  }).then(users => {
+    res.json(users.map(_transformUser));
   });
 }
 
@@ -103,7 +98,7 @@ function indexMemberHandler(req, res) {
 }
 
 module.exports = {
-  existUserHandler,
+  fetchUserHandler,
   showCurrentUserHandler,
   updateCurrentUserHandler,
   destroyCurrentUserHandler,
