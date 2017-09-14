@@ -10,7 +10,7 @@ function _transformUser(user) {
   };
 }
 
-function fetchUserHandler(req, res) {
+function searchUsersHandler(req, res) {
   const query = req.query;
 
   User.findAll({
@@ -20,7 +20,7 @@ function fetchUserHandler(req, res) {
   });
 }
 
-function showCurrentUserHandler(req, res) {
+function showUserHandler(req, res) {
   const user = req.user || null;
 
   if (user === null) {
@@ -32,7 +32,7 @@ function showCurrentUserHandler(req, res) {
   res.json(_transformUser(req.user));
 }
 
-function updateCurrentUserHandler(req, res) {
+function updateUserHandler(req, res) {
   const user = req.user || null;
   const name = req.body.name;
 
@@ -54,7 +54,7 @@ function updateCurrentUserHandler(req, res) {
   });
 }
 
-function destroyCurrentUserHandler(req, res) {
+function destroyUserHandler(req, res) {
   const userId = req.user.id;
 
   // Leave: Label, Request, Task
@@ -98,9 +98,9 @@ function indexMemberHandler(req, res) {
 }
 
 module.exports = {
-  fetchUserHandler,
-  showCurrentUserHandler,
-  updateCurrentUserHandler,
-  destroyCurrentUserHandler,
+  searchUsersHandler,
+  showUserHandler,
+  updateUserHandler,
+  destroyUserHandler,
   indexMemberHandler,
 };

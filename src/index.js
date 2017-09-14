@@ -13,10 +13,10 @@ const {
 } = require('./utils');
 
 const {
-  fetchUserHandler,
-  showCurrentUserHandler,
-  updateCurrentUserHandler,
-  destroyCurrentUserHandler,
+  searchUsersHandler,
+  showUserHandler,
+  updateUserHandler,
+  destroyUserHandler,
   indexMemberHandler,
 } = require('./handlers/user-handlers');
 
@@ -143,14 +143,10 @@ const router = new express.Router('');
 
 router.use('/api', new express.Router()
   .use('/v1', new express.Router()
-    .use('/users', new express.Router()
-      .get('/', [requireAuthorization], fetchUserHandler)
-      .get('/current', [requireAuthorization], showCurrentUserHandler)
-      .put('/current', [requireAuthorization], updateCurrentUserHandler)
-      .delete('/current', [requireAuthorization], destroyCurrentUserHandler)
-    )
-    .use('/members', new express.Router()
-      .get('/', [requireAuthorization], indexMemberHandler)
+    .use('/user', new express.Router()
+      .get('/', [requireAuthorization], showUserHandler)
+      .put('/', [requireAuthorization], updateUserHandler)
+      .delete('/', [requireAuthorization], destroyUserHandler)
     )
     .use('/tasks', new express.Router()
       .get('/', [requireAuthorization], indexTaskHandler)
@@ -173,6 +169,12 @@ router.use('/api', new express.Router()
       .post('/', [requireAuthorization], createRequestHandler)
       .put('/:id', [requireAuthorization], updateRequestHandler)
       .delete('/:id', [requireAuthorization], destroyRequestHandler)
+    )
+    .use('/members', new express.Router()
+      .get('/', [requireAuthorization], indexMemberHandler)
+    )
+    .use('/search', new express.Router()
+      .get('/users', [requireAuthorization], searchUsersHandler)
     )
   )
 );
