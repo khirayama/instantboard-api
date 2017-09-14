@@ -77,10 +77,16 @@ function indexMemberHandler(req, res) {
 
   Promise.all([
     Request.findAll({
-      where: {userId: user.id},
+      where: {
+        userId: user.id,
+        status: 'accepted',
+      },
     }),
     Request.findAll({
-      where: {memberId: user.id},
+      where: {
+        memberId: user.id,
+        status: 'accepted',
+      },
     }),
   ]).then(values => {
     const sentRequests = values[0];
