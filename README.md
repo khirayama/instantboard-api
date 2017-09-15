@@ -45,11 +45,10 @@ $ npm run test:e2e
 
 - `/api`
   - `/v1`
-    - `/tokens`
-      - `/` POST: create token
-    - `/users`
-      - `/current` GET: show current user
-      - `/current` PUT: update current user
+    - `/user`
+      - `/` GET: show current user
+      - `/` PUT: update current user
+      - `/` DELETE: delete current user
     - `/tasks`
       - `/` GET: index task
       - `/` POST: create task
@@ -70,4 +69,8 @@ $ npm run test:e2e
       - `/:id` GET: show request
       - `/:id` PUT: update request
       - `/:id` DELETE: delete request
-
+    - `/members`
+      - `/` GET: index members
+    - `/search`
+      - `/users`
+        - `/` GET: search users
