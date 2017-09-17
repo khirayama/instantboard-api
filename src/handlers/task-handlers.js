@@ -1,19 +1,22 @@
 const {Label, Task} = require('../models');
 const {parseTextWithSchedule} = require('../utils/parse-text-with-schedule');
 
-function _transformTask(task) {
+function _transformTask(task, label) {
   const task_ = task.dataValues || task;
   const {schedule, text} = parseTextWithSchedule(task_.content, new Date(task_.createdAt));
   return {
     id: task_.id,
-    labelId: task_.labelId,
+    label: {
+      id: label.id,
+      name: label.name,
+      priority: label.priority,
+      visibled: label.visibled,
+    },
     priority: task_.priority,
     content: task_.content,
     completed: task_.completed,
     text,
     schedule,
-    createdAt: task_.createdAt,
-    updatedAt: task_.updatedAt,
   };
 }
 
@@ -28,7 +31,14 @@ function indexTaskHandler(req, res) {
       where: {labelId: labelIds},
       order: [['priority', 'ASC']],
     }).then(tasks => {
-      res.json(tasks.map(_transformTask));
+      res.json(tasks.map(task => {
+        for (let i = 0; i < labels.length; i++) {
+          const label = labels[i];
+          if (label.id === task.labelId) {
+            return _transformTask(task, label);
+          }
+        }
+      }));
     });
   });
 }
@@ -43,15 +53,20 @@ function createTaskHandler(req, res) {
     labelId,
     content,
   }).then(task => {
-    res.json(_transformTask(task));
+    Label.findByIdAndUser(labelId, userId).then(label => {
+      res.json(_transformTask(task, label));
+    });
   });
 }
 
 function showTaskHandler(req, res) {
+  const userId = req.user.id;
   const taskId = req.params.id;
 
   Task.findById(taskId).then(task => {
-    res.json(_transformTask(task));
+    Label.findByIdAndUser(task.labelId, userId).then(label => {
+      res.json(_transformTask(task, label));
+    });
   });
 }
 
@@ -91,7 +106,9 @@ function updateTaskHandler(req, res) {
           completed: (completed === undefined) ? task.completed : completed,
           priority: count,
         }).then(task_ => {
-          res.json(_transformTask(task_));
+          Label.findByIdAndUser(task_.labelId, userId).then(label => {
+            res.json(_transformTask(task_, label));
+          });
         });
       });
     } else {
@@ -99,7 +116,9 @@ function updateTaskHandler(req, res) {
         content: (content === undefined) ? task.content : content,
         completed: (completed === undefined) ? task.completed : completed,
       }).then(task_ => {
-        res.json(_transformTask(task_));
+        Label.findByIdAndUser(task_.labelId, userId).then(label => {
+          res.json(_transformTask(task_, label));
+        });
       });
     }
   });
@@ -125,7 +144,9 @@ function destroyTaskHandler(req, res) {
     });
 
     task.destroy().then(destroyedTask => {
-      res.json(_transformTask(destroyedTask));
+      Label.findByIdAndUser(destroyedTask.labelId, userId).then(label => {
+        res.json(_transformTask(task_, label));
+      });
     });
   });
 }
@@ -135,61 +156,86 @@ function sortTaskHandler(req, res) {
   const taskId = req.params.id;
   const priority = req.body.priority;
 
-  Task.findById(taskId).then(task => {
-    if (task.priority < priority) {
-      Task.findAll({
-        where: {
-          userId,
-          labelId: task.labelId,
-          priority: {
-            $gt: task.priority,
-            $lte: priority,
+  Label.findAllFromStatus({
+    where: {userId},
+  }).then(labels => {
+    Task.findById(taskId).then(task => {
+      if (task.priority < priority) {
+        Task.findAll({
+          where: {
+            userId,
+            labelId: task.labelId,
+            priority: {
+              $gt: task.priority,
+              $lte: priority,
+            },
           },
-        },
-      }).then(tasks => {
-        tasks.forEach(task_ => {
-          task_.update({priority: task_.priority - 1});
-        });
-        task.update({priority}).then(() => {
-          Task.findAll({
-            where: {userId},
-            order: [['priority', 'ASC']],
-          }).then(tasks_ => {
-            res.json(tasks_.map(_transformTask));
+        }).then(tasks => {
+          tasks.forEach(task_ => {
+            task_.update({priority: task_.priority - 1});
+          });
+          task.update({priority}).then(() => {
+            Task.findAll({
+              where: {userId},
+              order: [['priority', 'ASC']],
+            }).then(tasks_ => {
+              res.json(tasks_.map(task => {
+                for (let i = 0; i < labels.length; i++) {
+                  const label = labels[i];
+                  if (label.id === task.labelId) {
+                    return _transformTask(task, label);
+                  }
+                }
+              }));
+            });
           });
         });
-      });
-    } else if (task.priority > priority) {
-      Task.findAll({
-        where: {
-          userId,
-          labelId: task.labelId,
-          priority: {
-            $gte: priority,
-            $lt: task.priority,
+      } else if (task.priority > priority) {
+        Task.findAll({
+          where: {
+            userId,
+            labelId: task.labelId,
+            priority: {
+              $gte: priority,
+              $lt: task.priority,
+            },
           },
-        },
-      }).then(tasks => {
-        tasks.forEach(task_ => {
-          task_.update({priority: task_.priority + 1});
-        });
-        task.update({priority}).then(() => {
-          Task.findAll({
-            where: {userId},
-            order: [['priority', 'ASC']],
-          }).then(tasks_ => {
-            res.json(tasks_.map(_transformTask));
+        }).then(tasks => {
+          tasks.forEach(task_ => {
+            task_.update({priority: task_.priority + 1});
+          });
+          task.update({priority}).then(() => {
+            Task.findAll({
+              where: {userId},
+              order: [['priority', 'ASC']],
+            }).then(tasks_ => {
+              res.json(tasks_.map(task => {
+                for (let i = 0; i < labels.length; i++) {
+                  const label = labels[i];
+                  if (label.id === task.labelId) {
+                    return _transformTask(task, label);
+                  }
+                }
+              }));
+            });
           });
         });
-      });
-    } else {
-      Task.findAll({
-        where: {userId},
-        order: [['priority', 'ASC']],
-      }).then(tasks_ => {
-        res.json(tasks_.map(_transformTask));
-      });
-    }
+      } else {
+        Task.findAll({
+          where: {userId},
+          order: [['priority', 'ASC']],
+        }).then(tasks_ => {
+          res.json(tasks_.map(task => {
+            for (let i = 0; i < labels.length; i++) {
+              const label = labels[i];
+              if (label.id === task.labelId) {
+                return _transformTask(task, label);
+              }
+            }
+          }));
+        });
+      }
+    });
   });
 }
 
