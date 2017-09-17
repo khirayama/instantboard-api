@@ -1,4 +1,4 @@
-function _getMembers(label, requests, users) {
+function _getRequests(label, requests, users) {
   const requests_ = [];
   for (let j = 0; j < requests.length; j++) {
     const request = requests[j];
@@ -7,15 +7,21 @@ function _getMembers(label, requests, users) {
         const user = users[k];
         if (user.id === request.memberId) {
           requests_.push({
-            id: user.id,
-            name: user.name,
+            id: request.id,
             status: request.status,
+            member: {
+              id: user.id,
+              name: user.name,
+            },
           });
         } else if (user.id === label.userId) {
           requests_.push({
-            id: user.id,
-            name: user.name,
+            id: request.id,
             status: 'accepted',
+            member: {
+              id: user.id,
+              name: user.name,
+            },
           });
         }
       }
@@ -96,7 +102,7 @@ module.exports = (sequelize, DataTypes) => {
                     visibled: labelStatus.visibled,
                     createdAt: label.createdAt,
                     updatedAt: label.updatedAt,
-                    members: _getMembers(label, requests, users),
+                    requests: _getRequests(label, requests, users),
                   };
                 }
               }
@@ -142,7 +148,7 @@ module.exports = (sequelize, DataTypes) => {
             visibled: labelStatus.visibled,
             createdAt: label.createdAt,
             updatedAt: label.updatedAt,
-            members: _getMembers(label, requests, users),
+            requests: _getRequests(label, requests, users),
           });
         });
       });
