@@ -86,6 +86,23 @@ passport.use(
   })
 );
 
+app.get('/auth/tester', (req, res, next) => {
+  const name = 'tester';
+  User.findOrCreate({
+    where: {name},
+    defaults: {name, provider: name, uid: name},
+  }).spread(user => {
+    const now = new Date();
+    const expires = now.setYear(now.getFullYear() + 3);
+    const token = jwt.encode({
+      sub: user.id,
+      exp: expires,
+      iat: now.getTime(),
+    }, SECRET_KEY);
+    res.redirect(`${APP_SERVER_HOST}/login?token=${token}`);
+  });
+});
+
 app.get('/auth/:provider', (req, res, next) => {
   const provider = req.params.provider;
 
