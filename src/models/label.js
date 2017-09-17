@@ -14,15 +14,6 @@ function _getRequests(label, requests, users) {
               name: user.name,
             },
           });
-        } else if (user.id === label.userId) {
-          requests_.push({
-            id: request.id,
-            status: 'accepted',
-            member: {
-              id: user.id,
-              name: user.name,
-            },
-          });
         }
       }
     }

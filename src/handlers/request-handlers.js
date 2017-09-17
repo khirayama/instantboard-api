@@ -100,7 +100,7 @@ function createRequestHandler(req, res) {
       }).then(request => {
         res.json(_transformRequest(request[0]));
       });
-    }).catch(err => {
+    }).catch(() => {
       res.status(400).send({
         error: 'No existed user.',
       });

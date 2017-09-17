@@ -38,6 +38,7 @@ function indexTaskHandler(req, res) {
             return _transformTask(task, label);
           }
         }
+        return null;
       }));
     });
   });
@@ -145,7 +146,7 @@ function destroyTaskHandler(req, res) {
 
     task.destroy().then(destroyedTask => {
       Label.findByIdAndUser(destroyedTask.labelId, userId).then(label => {
-        res.json(_transformTask(task_, label));
+        res.json(_transformTask(task, label));
       });
     });
   });
@@ -186,6 +187,7 @@ function sortTaskHandler(req, res) {
                     return _transformTask(task, label);
                   }
                 }
+                return null;
               }));
             });
           });
@@ -216,6 +218,7 @@ function sortTaskHandler(req, res) {
                     return _transformTask(task, label);
                   }
                 }
+                return null;
               }));
             });
           });
@@ -232,6 +235,7 @@ function sortTaskHandler(req, res) {
                 return _transformTask(task, label);
               }
             }
+            return null;
           }));
         });
       }
