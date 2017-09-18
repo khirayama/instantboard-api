@@ -46,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
       }, options).then(res => {
         const requests = res[1];
         const request = requests[0];
+
         LabelStatus.count({
           where: {
             userId: request.memberId,
@@ -63,7 +64,7 @@ module.exports = (sequelize, DataTypes) => {
               visibled: true,
             },
           });
-          resolve();
+          resolve(request);
         });
       }).catch(err => console.log(err));
     }).catch(err => console.log(err));

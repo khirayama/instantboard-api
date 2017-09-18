@@ -86,7 +86,7 @@ passport.use(
   })
 );
 
-app.get('/auth/tester', (req, res, next) => {
+app.get('/auth/tester', (req, res) => {
   const name = 'tester';
   User.findOrCreate({
     where: {name},

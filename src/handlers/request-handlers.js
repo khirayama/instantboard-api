@@ -3,8 +3,14 @@ const {Request, User, Label} = require('../models');
 function _transformRequest(request) {
   return {
     id: request.id,
-    memberName: request.memberName,
-    labelName: request.labelName,
+    member: {
+      id: request.member.id,
+      name: request.member.name,
+    },
+    label: {
+      id: request.label.id,
+      name: request.label.name,
+    },
     status: request.status,
     createdAt: request.createdAt,
     updatedAt: request.updatedAt,
@@ -41,12 +47,18 @@ function indexRequestHandler(req, res) {
         };
         users.forEach(user => {
           if (request.userId === user.id) {
-            request_.memberName = user.name;
+            request_.member = {
+              id: user.id,
+              name: user.name,
+            };
           }
         });
         labels.forEach(label => {
           if (request.labelId === label.id) {
-            request_.labelName = label.name;
+            request_.label = {
+              id: label.id,
+              name: label.name,
+            };
           }
         });
         return request_;
@@ -97,8 +109,17 @@ function createRequestHandler(req, res) {
           memberId: user.id,
           status: 'pending',
         },
-      }).then(request => {
-        res.json(_transformRequest(request[0]));
+      }).spread(request => {
+        Promise.all([
+          Label.findById(request.labelId),
+          User.findById(request.memberId),
+        ]).then(res_ => {
+          const label = res_[0];
+          const member = res_[1];
+          request.member = member;
+          request.label = label;
+          res.json(_transformRequest(request));
+        });
       });
     }).catch(() => {
       res.status(400).send({
@@ -118,7 +139,16 @@ function updateRequestHandler(req, res) {
         where: {id: requestId},
         individualHooks: true,
       }).then(request => {
-        res.json(_transformRequest(request));
+        Promise.all([
+          Label.findById(request.labelId),
+          User.findById(request.memberId),
+        ]).then(res_ => {
+          const label = res_[0];
+          const member = res_[1];
+          request.member = member;
+          request.label = label;
+          res.json(_transformRequest(request));
+        });
       });
       break;
     }
@@ -127,7 +157,16 @@ function updateRequestHandler(req, res) {
         where: {id: requestId},
         individualHooks: true,
       }).then(request => {
-        res.json(_transformRequest(request));
+        Promise.all([
+          Label.findById(request.labelId),
+          User.findById(request.memberId),
+        ]).then(res_ => {
+          const label = res_[0];
+          const member = res_[1];
+          request.member = member;
+          request.label = label;
+          res.json(_transformRequest(request));
+        });
       });
       break;
     }
