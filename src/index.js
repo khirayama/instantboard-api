@@ -65,7 +65,7 @@ passport.use(
   }, (accessToken, refreshToken, profile, done) => {
     const provider = 'facebook';
     const uid = profile.id;
-    const name = `${provider}-${uid}`;
+    const name = `${provider}-${profile.id}`;
 
     User.findOrCreate({
       where: {provider, uid},
