@@ -49,13 +49,9 @@ const app = express();
 
 const SECRET_KEY = process.env.SECRET_KEY;
 
-const API_SERVER_PORT = process.env.API_SERVER_PORT;
-const API_SERVER_HOSTNAME = process.env.API_SERVER_HOSTNAME;
-const API_SERVER_HOST = `http://${API_SERVER_HOSTNAME}:${API_SERVER_PORT}`;
-
-const APP_SERVER_PORT = process.env.APP_SERVER_PORT;
-const APP_SERVER_HOSTNAME = process.env.APP_SERVER_HOSTNAME;
-const APP_SERVER_HOST = `http://${APP_SERVER_HOSTNAME}:${APP_SERVER_PORT}`;
+const API_SERVER_PORT = process.env.PORT || 3001;
+const API_SERVER_HOST = process.env.API_SERVER_HOST || 'http://127.0.0.1:3001';
+const APP_SERVER_HOST = process.env.APP_SERVER_HOST || 'http://127.0.0.1:3000';
 
 passport.use(
   new FacebookStrategy({
