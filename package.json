@@ -3,12 +3,9 @@
   "version": "1.0.0",
   "description": "instantboard api server",
   "main": "src/index.js",
-  "repository": {},
   "author": "khirayama",
-  "license": "MIT",
   "engines": {
-    "node": "^8.0.0",
-    "npm": "^5.0.0"
+    "node": "8.5.0"
   },
   "scripts": {
     "dev": "nodemon src/index.js --ignore test",
@@ -35,9 +32,7 @@
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1",
     "sequelize": "^4.10.2",
-    "sequelize-cli": "^3.0.0"
-  },
-  "devDependencies": {
+    "sequelize-cli": "^3.0.0",
     "ajv": "^5.2.2",
     "ava": "^0.22.0",
     "axios": "^0.16.2",
