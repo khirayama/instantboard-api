@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const compression = require('compression');
 
 const jwt = require('jwt-simple');
 const passport = require('passport');
@@ -192,6 +193,11 @@ router.use('/api', new express.Router()
   )
 );
 
+app.use(compression({
+  threshold: 0,
+  level: 9,
+  memLevel: 9,
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use((req, res, next) => {
