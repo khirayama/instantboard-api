@@ -2,12 +2,12 @@ const taskResponseSchema = {
   type: 'object',
   required: [
     'id',
+    'label',
+    'priority',
     'content',
+    'completed',
     'text', // For response
     'schedule', // For response
-    'labelId',
-    'priority',
-    'completed',
     'createdAt',
     'updatedAt',
   ],
@@ -15,23 +15,37 @@ const taskResponseSchema = {
     id: {
       type: 'integer',
     },
+    label: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'integer',
+        },
+        name: {
+          type: 'string',
+        },
+        priority: {
+          type: 'integer',
+        },
+        visibled: {
+          type: 'boolean',
+        },
+      },
+    },
+    priority: {
+      type: 'integer',
+    },
     content: {
       type: 'string',
+    },
+    completed: {
+      type: 'boolean',
     },
     text: {
       type: 'string',
     },
     schedule: {
       type: ['object', 'null'],
-    },
-    labelId: {
-      type: 'integer',
-    },
-    priority: {
-      type: 'integer',
-    },
-    completed: {
-      type: 'boolean',
     },
     createdAt: {
       type: ['string', 'object'],

@@ -171,11 +171,12 @@ test.cb('showTaskHandler > work without error', t => {
           labelId: label.id,
           content: 'Test task',
         }).then(task => {
-          resolve(task);
+          resolve({user, task});
         });
       });
     });
-  }).then(task => {
+  }).then(({user, task}) => {
+    req.user = user;
     req.params.id = task.id;
 
     showTaskHandler(req, res);
@@ -343,11 +344,15 @@ test.cb('updateTaskHandler > work without error', t => {
   const req = createRequest();
   const res = createResponse();
 
+  let userId = null;
+
   new Promise(resolve => {
     User.create({
       uid: uuid(),
       provider: 'facebook',
     }).then(user => {
+      userId = user.id;
+
       Label.createWithStatus({
         userId: user.id,
         name: 'Test Label',
@@ -394,14 +399,14 @@ test.cb('updateTaskHandler > work without error', t => {
     t.true(ajv.validate(taskResponseSchema, task));
 
     Label.findAllFromStatus({
-      where: {userId: task.userId},
+      where: {userId},
     }).then(labels => {
       const labelIds = labels.map(label => label.id);
       Task.findAll({
         where: {labelId: labelIds},
       }).then(tasks => {
-        const labelTasks = tasks.filter(task_ => task_.labelId !== task.labelId);
-        const label2Tasks = tasks.filter(task_ => task_.labelId === task.labelId);
+        const labelTasks = tasks.filter(task_ => task_.labelId !== task.label.id);
+        const label2Tasks = tasks.filter(task_ => task_.labelId === task.label.id);
         t.is(labelTasks.length, 1);
         t.is(label2Tasks.length, 2);
         t.end();
@@ -449,11 +454,15 @@ test.cb('destroyTaskHandler > work without error', t => {
   const req = createRequest();
   const res = createResponse();
 
+  let userId = null;
+
   new Promise(resolve => {
     User.create({
       uid: uuid(),
       provider: 'facebook',
     }).then(user => {
+      userId = user.id;
+
       Label.createWithStatus({
         userId: user.id,
         name: 'Test Label',
@@ -482,9 +491,10 @@ test.cb('destroyTaskHandler > work without error', t => {
 
   res.on(task => {
     t.true(ajv.validate(taskResponseSchema, task));
+    t.end();
 
     Label.findAllFromStatus({
-      where: {userId: task.userId},
+      where: {userId},
     }).then(labels => {
       const labelIds = labels.map(label => label.id);
       Task.findAll({

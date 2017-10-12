@@ -1,14 +1,20 @@
-// Modules
 const test = require('ava');
 const Ajv = require('ajv');
 const uuid = require('uuid/v4');
 
-// Test modules
-const {createRequest, createResponse} = require('../mock');
+const {
+  createRequest,
+  createResponse,
+} = require('../mock');
 
-// Src modules
-const {User, Label} = require('../../src/models');
-const {labelResponseSchema, labelsResponseSchema} = require('../schemas/label-response-schema');
+const {
+  User,
+  Label,
+} = require('../../src/models');
+const {
+  labelResponseSchema,
+  labelsResponseSchema,
+} = require('../schemas/label-response-schema');
 const {
   indexLabelHandler,
   showLabelHandler,

@@ -1,19 +1,19 @@
-// Modules
 const test = require('ava');
 const uuid = require('uuid/v4');
 
-// Test modules
-const {createRequest, createResponse} = require('../mock');
+const {
+  createRequest,
+  createResponse,
+} = require('../mock');
 
-// Src modules
 const {errorMessages} = require('../../src/constants');
 const {User} = require('../../src/models');
 const {
-  showCurrentUserHandler,
-  updateCurrentUserHandler,
+  showUserHandler,
+  updateUserHandler,
 } = require('../../src/handlers/user-handlers');
 
-test.cb('showCurrentUserHandler > work without error', t => {
+test.cb('showUserHandler > work without error', t => {
   const req = createRequest();
   const res = createResponse();
 
@@ -28,10 +28,10 @@ test.cb('showCurrentUserHandler > work without error', t => {
     name: 'test user',
   };
 
-  showCurrentUserHandler(req, res);
+  showUserHandler(req, res);
 });
 
-test.cb('showCurrentUserHandler > work with error', t => {
+test.cb('showUserHandler > work with error', t => {
   const req = createRequest();
   const res = createResponse();
 
@@ -42,10 +42,10 @@ test.cb('showCurrentUserHandler > work with error', t => {
 
   req.user = null;
 
-  showCurrentUserHandler(req, res);
+  showUserHandler(req, res);
 });
 
-test.cb('updateCurrentUserHandler > set name without error', t => {
+test.cb('updateUserHandler > set name without error', t => {
   const req = createRequest();
   const res = createResponse();
 
@@ -62,11 +62,11 @@ test.cb('updateCurrentUserHandler > set name without error', t => {
     req.user = user.dataValues;
     req.body.name = `test user ${uuid()}`;
 
-    updateCurrentUserHandler(req, res);
+    updateUserHandler(req, res);
   });
 });
 
-test.cb('updateCurrentUserHandler > set name with error', t => {
+test.cb('updateUserHandler > set name with error', t => {
   const req = createRequest();
   const res = createResponse();
 
@@ -90,6 +90,6 @@ test.cb('updateCurrentUserHandler > set name with error', t => {
     req.user = users[1].dataValues;
     req.body.name = `test user ${uid}`;
 
-    updateCurrentUserHandler(req, res);
+    updateUserHandler(req, res);
   });
 });

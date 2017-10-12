@@ -1,15 +1,22 @@
-const memberResponseSchema = {
+const requestResponseSchema = {
   type: 'object',
-  required: ['id', 'name', 'requestStatus'],
   properties: {
     id: {
-      type: 'number',
+      type: 'integer',
     },
-    name: {
+    status: {
       type: 'string',
     },
-    requestStatus: {
-      type: 'string',
+    member: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'integer',
+        },
+        name: {
+          type: ['string', 'null'],
+        },
+      },
     },
   },
 };
@@ -18,9 +25,10 @@ const labelResponseSchema = {
   type: 'object',
   required: [
     'id',
+    'name',
     'priority',
     'visibled',
-    'members',
+    'requests',
     'createdAt',
     'updatedAt',
   ],
@@ -28,15 +36,18 @@ const labelResponseSchema = {
     id: {
       type: 'integer',
     },
+    name: {
+      type: 'string',
+    },
     priority: {
       type: 'integer',
     },
     visibled: {
       type: 'boolean',
     },
-    members: {
+    requests: {
       type: 'array',
-      items: memberResponseSchema,
+      items: requestResponseSchema,
     },
     createdAt: {
       type: ['string', 'object'],
@@ -53,7 +64,6 @@ const labelsResponseSchema = {
 };
 
 module.exports = {
-  memberResponseSchema,
   labelResponseSchema,
   labelsResponseSchema,
 };
