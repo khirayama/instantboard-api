@@ -43,7 +43,6 @@ module.exports = (sequelize, DataTypes) => {
     return new Promise(resolve => {
       Task.count({
         where: {
-          userId: values.userId,
           labelId: values.labelId,
         },
       }).then(count => {
