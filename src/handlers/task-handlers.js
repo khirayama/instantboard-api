@@ -90,7 +90,7 @@ function updateTaskHandler(req, res) {
   const completed = req.body.completed;
 
   Task.findById(taskId).then(task => {
-    if (labelId && labelId !== String(task.labelId)) {
+    if (labelId && String(labelId) !== String(task.labelId)) {
       Promise.all([
         Task.count({
           where: {labelId},
