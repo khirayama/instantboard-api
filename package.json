@@ -16,9 +16,8 @@
     "lint": "eslint --ignore-path .gitignore src test",
     "lint:fix": "eslint --ignore-path .gitignore --fix src test",
     "check": "npm-check-updates",
-    "test": "NODE_ENV=test ava test/**/*.test.js !test/e2e/**/*.test.js",
-    "test:watch": "NODE_ENV=test ava -w test/**/*.test.js !test/e2e/**/*.test.js",
-    "test:e2e": "NODE_ENV=test ava test/e2e/**/*.test.js"
+    "test": "NODE_ENV=test ava test/**/*.test.js",
+    "test:watch": "NODE_ENV=test ava -w test/**/*.test.js"
   },
   "dependencies": {
     "ajv": "^5.2.3",
