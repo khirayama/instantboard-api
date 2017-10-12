@@ -141,8 +141,8 @@ module.exports = (sequelize, DataTypes) => {
             updatedAt: label.updatedAt,
             requests: _getRequests(label, requests, users),
           });
-        });
-      });
+        }).catch(err => console.log(err));
+      }).catch(err => console.log(err));
     });
   };
 

@@ -17,6 +17,8 @@ function _transformTask(task, label) {
     completed: task_.completed,
     text,
     schedule,
+    createdAt: task_.createdAt,
+    updatedAt: task_.updatedAt,
   };
 }
 

@@ -55,9 +55,9 @@ module.exports = (sequelize, DataTypes) => {
           completed: false,
         }).then(task => {
           resolve(task);
-        });
-      });
-    });
+        }).catch(err => console.log(err));
+      }).catch(err => console.log(err));
+    }).catch(err => console.log(err));
   };
 
   return Task;
