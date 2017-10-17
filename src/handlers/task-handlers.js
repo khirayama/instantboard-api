@@ -1,3 +1,4 @@
+const Sequelize = require('sequelize');
 const {Label, Task} = require('../models');
 const {parseTextWithSchedule} = require('../utils/parse-text-with-schedule');
 
@@ -99,7 +100,7 @@ function updateTaskHandler(req, res) {
           where: {
             labelId: task.labelId,
             priority: {
-              $gt: task.priority,
+              [Sequelize.Op.gt]: task.priority,
             },
           },
         }),
@@ -144,7 +145,7 @@ function destroyTaskHandler(req, res) {
       where: {
         labelId: task.labelId,
         priority: {
-          $gt: task.priority,
+          [Sequelize.Op.gt]: task.priority,
         },
       },
     }).then(tasks => {
@@ -175,8 +176,8 @@ function sortTaskHandler(req, res) {
           where: {
             labelId: task.labelId,
             priority: {
-              $gt: task.priority,
-              $lte: priority,
+              [Sequelize.Op.gt]: task.priority,
+              [Sequelize.Op.lte]: priority,
             },
           },
         }).then(tasks => {
@@ -194,8 +195,8 @@ function sortTaskHandler(req, res) {
           where: {
             labelId: task.labelId,
             priority: {
-              $gte: priority,
-              $lt: task.priority,
+              [Sequelize.Op.gte]: priority,
+              [Sequelize.Op.lt]: task.priority,
             },
           },
         }).then(tasks => {

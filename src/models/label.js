@@ -1,3 +1,5 @@
+const Sequelize = require('sequelize');
+
 function _getRequests(label, requests, users) {
   const requests_ = [];
   for (let j = 0; j < requests.length; j++) {
@@ -224,7 +226,7 @@ module.exports = (sequelize, DataTypes) => {
           where: {
             userId,
             priority: {
-              $gt: cachedLabel.priority,
+              [Sequelize.Op.gt]: cachedLabel.priority,
             },
           },
         }).then(labelStatuses => {
@@ -280,8 +282,8 @@ module.exports = (sequelize, DataTypes) => {
             where: {
               userId,
               priority: {
-                $gt: labelStatus.priority,
-                $lte: priority,
+                [Sequelize.Op.gt]: labelStatus.priority,
+                [Sequelize.Op.lte]: priority,
               },
             },
           }).then(labelStatuses => {
@@ -302,8 +304,8 @@ module.exports = (sequelize, DataTypes) => {
             where: {
               userId,
               priority: {
-                $gte: priority,
-                $lt: labelStatus.priority,
+                [Sequelize.Op.gte]: priority,
+                [Sequelize.Op.lt]: labelStatus.priority,
               },
             },
           }).then(labelStatuses => {
