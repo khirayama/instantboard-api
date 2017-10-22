@@ -167,54 +167,50 @@ function sortTaskHandler(req, res) {
   const taskId = req.params.id;
   const priority = req.body.priority;
 
-  Label.findAllFromStatus({
-    where: {userId},
-  }).then(labels => {
-    Task.findById(taskId).then(task => {
-      if (task.priority < priority) {
-        Task.findAll({
-          where: {
-            labelId: task.labelId,
-            priority: {
-              [Sequelize.Op.gt]: task.priority,
-              [Sequelize.Op.lte]: priority,
-            },
+  Task.findById(taskId).then(task => {
+    if (task.priority < priority) {
+      Task.findAll({
+        where: {
+          labelId: task.labelId,
+          priority: {
+            [Sequelize.Op.gt]: task.priority,
+            [Sequelize.Op.lte]: priority,
           },
-        }).then(tasks => {
-          tasks.forEach(task_ => {
-            task_.update({priority: task_.priority - 1});
-          });
-          task.update({priority}).then(() => {
-            _indexTask(userId).then(tasks => {
-              res.json(tasks);
-            });
+        },
+      }).then(tasks => {
+        tasks.forEach(task_ => {
+          task_.update({priority: task_.priority - 1});
+        });
+        task.update({priority}).then(() => {
+          _indexTask(userId).then(tasks => {
+            res.json(tasks);
           });
         });
-      } else if (task.priority > priority) {
-        Task.findAll({
-          where: {
-            labelId: task.labelId,
-            priority: {
-              [Sequelize.Op.gte]: priority,
-              [Sequelize.Op.lt]: task.priority,
-            },
+      });
+    } else if (task.priority > priority) {
+      Task.findAll({
+        where: {
+          labelId: task.labelId,
+          priority: {
+            [Sequelize.Op.gte]: priority,
+            [Sequelize.Op.lt]: task.priority,
           },
-        }).then(tasks => {
-          tasks.forEach(task_ => {
-            task_.update({priority: task_.priority + 1});
-          });
-          task.update({priority}).then(() => {
-            _indexTask(userId).then(tasks => {
-              res.json(tasks);
-            });
+        },
+      }).then(tasks => {
+        tasks.forEach(task_ => {
+          task_.update({priority: task_.priority + 1});
+        });
+        task.update({priority}).then(() => {
+          _indexTask(userId).then(tasks => {
+            res.json(tasks);
           });
         });
-      } else {
-        _indexTask(userId).then(tasks => {
-          res.json(tasks);
-        });
-      }
-    });
+      });
+    } else {
+      _indexTask(userId).then(tasks => {
+        res.json(tasks);
+      });
+    }
   });
 }
 
