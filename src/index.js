@@ -8,10 +8,7 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 
 const {User} = require('./models');
 
-const {
-  extractAccessTokenFromHeader,
-  checkAccessToken,
-} = require('./utils');
+const {checkAccessToken} = require('./utils');
 
 const {
   searchUsersHandler,
@@ -125,7 +122,7 @@ app.get('/auth/:provider/callback', (req, res, next) => {
 });
 
 function requireAuthorization(req, res, next) {
-  const accessToken = extractAccessTokenFromHeader(req.headers.authorization);
+  const accessToken = req.query.token;
   const payload = checkAccessToken(accessToken);
 
   if (payload === null) {
