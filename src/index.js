@@ -62,23 +62,29 @@ passport.use(
   }, (accessToken, refreshToken, profile, done) => {
     const provider = 'facebook';
     const uid = profile.id;
-    const name = `${provider}-${profile.id}`;
+    const name = `${profile.displayName}`;
+    `${provider}-${profile.id}`;
+    console.log(profile);
 
-    User.findOrCreate({
-      where: {provider, uid},
-      defaults: {provider, uid, name},
-    }).spread(user => {
-      const now = new Date();
-      const expires = now.setYear(now.getFullYear() + 3);
+    User.count({
+      where: {name}
+    }).then(count => {
+      User.findOrCreate({
+        where: {provider, uid},
+        defaults: {provider, uid, name: `${name}_${count}`},
+      }).spread(user => {
+        const now = new Date();
+        const expires = now.setYear(now.getFullYear() + 3);
 
-      // Ref: [JA] https://hiyosi.tumblr.com/post/70073770678/jwt%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E7%B0%A1%E5%8D%98%E3%81%AB%E3%81%BE%E3%81%A8%E3%82%81%E3%81%A6%E3%81%BF%E3%81%9F
-      const token = jwt.encode({
-        sub: user.id,
-        exp: expires,
-        iat: now.getTime(),
-      }, SECRET_KEY);
+        // Ref: [JA] https://hiyosi.tumblr.com/post/70073770678/jwt%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E7%B0%A1%E5%8D%98%E3%81%AB%E3%81%BE%E3%81%A8%E3%82%81%E3%81%A6%E3%81%BF%E3%81%9F
+        const token = jwt.encode({
+          sub: user.id,
+          exp: expires,
+          iat: now.getTime(),
+        }, SECRET_KEY);
 
-      done(null, {token});
+        done(null, {token});
+      });
     });
   })
 );
