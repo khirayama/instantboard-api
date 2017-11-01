@@ -25,7 +25,7 @@
     "axios": "^0.17.0",
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
-    "eslint": "^4.9.0",
+    "eslint": "^4.10.0",
     "eslint-config-xo-space": "^0.17.0",
     "express": "^4.16.2",
     "jwt-simple": "^0.5.1",
@@ -35,7 +35,7 @@
     "npm-check-updates": "^2.13.0",
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1",
-    "sequelize": "^4.17.2",
+    "sequelize": "^4.22.1",
     "sequelize-cli": "^3.0.0",
     "uuid": "^3.1.0"
   },
