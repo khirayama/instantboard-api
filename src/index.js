@@ -63,11 +63,9 @@ passport.use(
     const provider = 'facebook';
     const uid = profile.id;
     const name = `${profile.displayName}`;
-    `${provider}-${profile.id}`;
-    console.log(profile);
 
     User.count({
-      where: {name}
+      where: {name},
     }).then(count => {
       User.findOrCreate({
         where: {provider, uid},
