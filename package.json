@@ -8,7 +8,7 @@
     "node": "8.5.0"
   },
   "scripts": {
-    "start": "node src/index.js",
+    "start": "forever src/index.js",
     "dev": "nodemon src/index.js --ignore test",
     "db:create": "mysql -u root < migrations/db.sql",
     "db:migrate": "sequelize db:migrate --config migrations/config.js --migrations-path migrations/files",
@@ -28,6 +28,7 @@
     "eslint": "^4.11.0",
     "eslint-config-xo-space": "^0.17.0",
     "express": "^4.16.2",
+    "forever": "^0.15.3",
     "jwt-simple": "^0.5.1",
     "mysql": "^2.15.0",
     "mysql2": "^1.5.1",
