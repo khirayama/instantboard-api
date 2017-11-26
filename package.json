@@ -20,12 +20,12 @@
     "test:watch": "NODE_ENV=test ava -w test/**/*.test.js"
   },
   "dependencies": {
-    "ajv": "^5.4.0",
+    "ajv": "^5.5.0",
     "ava": "^0.23.0",
     "axios": "^0.17.1",
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
-    "eslint": "^4.11.0",
+    "eslint": "^4.12.0",
     "eslint-config-xo-space": "^0.17.0",
     "express": "^4.16.2",
     "forever": "^0.15.3",
@@ -36,7 +36,7 @@
     "npm-check-updates": "^2.13.0",
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1",
-    "sequelize": "^4.22.12",
+    "sequelize": "^4.23.1",
     "sequelize-cli": "^3.1.0",
     "uuid": "^3.1.0"
   },
