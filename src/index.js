@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const compression = require('compression');
@@ -6,7 +7,9 @@ const jwt = require('jwt-simple');
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 
-const {User} = require('./models');
+const {
+  User,
+} = require('./models');
 
 const {
   extractAccessTokenFromHeader,
@@ -202,6 +205,7 @@ app.use(compression({
   level: 9,
   memLevel: 9,
 }));
+app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use((req, res, next) => {
