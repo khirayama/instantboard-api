@@ -8,7 +8,7 @@
     "node": "9.2.0"
   },
   "scripts": {
-    "start": "forever src/index.js",
+    "start": "forever --silent src/index.js",
     "dev": "nodemon src/index.js --ignore test",
     "db:create": "mysql -u root < migrations/db.sql",
     "db:migrate": "sequelize db:migrate --config migrations/config.js --migrations-path migrations/files",
