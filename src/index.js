@@ -62,18 +62,24 @@ passport.use(
     clientID: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
     callbackURL: `${API_SERVER_HOST}/auth/facebook/callback`,
+    profileFields: ['email'],
   }, (accessToken, refreshToken, profile, done) => {
     const provider = 'facebook';
     const uid = profile.id;
     const name = `${profile.displayName}`;
+    const email = profile.emails[0].value;
 
     User.count({
       where: {name},
     }).then(count => {
       User.findOrCreate({
         where: {provider, uid},
-        defaults: {provider, uid, name: `${name}_${count}`},
-      }).spread(user => {
+        defaults: {provider, uid, name: `${name}_${count}`, email},
+      }).spread((user, isCreate) => {
+        if (!isCreate) {
+          user.update({email});
+        }
+
         const now = new Date();
         const expires = now.setYear(now.getFullYear() + 3);
 
@@ -112,7 +118,7 @@ app.get('/auth/:provider', (req, res, next) => {
 
   passport.authenticate(provider, {
     session: false,
-    scope: [],
+    scope: ['email'],
   })(req, res, next);
 });
 
