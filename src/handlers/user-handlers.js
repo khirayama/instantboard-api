@@ -1,5 +1,16 @@
+const {Op} = require('sequelize');
 const {errorMessages} = require('../constants');
 const {User, Request, LabelStatus} = require('../models');
+
+function parseQueryForSequelizeWhere(q = '', fields = []) {
+  const keywords = q.split(/(\ |　)/).filter(str => (str !== ' ' && str !== '　'));
+  const query = {};
+  for (let i = 0; i < fields.length; i++) {
+    query[fields[i]] = {[Op.or]: keywords};
+  }
+
+  return {[Op.or]: query};
+}
 
 function _transformUser(user) {
   return {
@@ -13,10 +24,9 @@ function _transformUser(user) {
 
 function searchUsersHandler(req, res) {
   const query = req.query;
+  const where = parseQueryForSequelizeWhere(query.q, ['name', 'email']);
 
-  User.findAll({
-    where: query,
-  }).then(users => {
+  User.findAll({where}).then(users => {
     res.json(users.map(_transformUser));
   });
 }
