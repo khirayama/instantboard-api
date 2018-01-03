@@ -10,7 +10,6 @@ module.exports = {
       collate: 'utf8mb4_general_ci',
     });
   },
-
   down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn('users', 'email');
   }
