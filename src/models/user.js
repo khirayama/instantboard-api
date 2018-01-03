@@ -9,14 +9,18 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true,
-      unique: true,
     },
     email: {
       type: DataTypes.STRING,
       allowNull: true,
       unique: true,
+    },
+    imageUrl: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      field: 'image_url',
     },
     createdAt: {
       type: DataTypes.DATE,
