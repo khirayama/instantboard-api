@@ -13,7 +13,7 @@
     "db:create": "mysql -u root < migrations/db.sql",
     "db:migrate": "sequelize db:migrate --config migrations/config.js --migrations-path migrations/files",
     "db:migrate:undo": "sequelize db:migrate:undo --config migrations/config.js --migrations-path migrations/files",
-    "migration:create": "sequelize migration:create --config migrations/config.js --name",
+    "migration:create": "sequelize migration:create --config migrations/config.js --migrations-path migrations/files --name",
     "lint": "eslint --ignore-path .gitignore src test",
     "lint:fix": "eslint --ignore-path .gitignore --fix src test",
     "check": "npm-check-updates",
