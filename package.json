@@ -14,12 +14,16 @@
     "db:migrate": "sequelize db:migrate --config migrations/config.js --migrations-path migrations/files",
     "db:migrate:undo": "sequelize db:migrate:undo --config migrations/config.js --migrations-path migrations/files",
     "migration:create": "sequelize migration:create --config migrations/config.js --migrations-path migrations/files --name",
-    "lint": "eslint --ignore-path .gitignore src test",
-    "lint:fix": "eslint --ignore-path .gitignore --fix src test",
+    "lint": "eslint --fix --ignore-path .gitignore src test",
+    "format": "prettier --ignore-path .gitignore --config .prettierrc --write 'src/**/*'",
     "check": "npm-check-updates",
     "test": "NODE_ENV=test ava test/**/*.test.js",
     "test:watch": "NODE_ENV=test ava -w test/**/*.test.js"
   },
+  "pre-commit": [
+    "lint",
+    "format"
+  ],
   "dependencies": {
     "ajv": "5.5.2",
     "ava": "0.24.0",
@@ -27,6 +31,7 @@
     "body-parser": "1.18.2",
     "compression": "1.7.1",
     "eslint": "4.14.0",
+    "eslint-config-prettier": "2.9.0",
     "eslint-config-xo-space": "0.17.0",
     "express": "4.16.2",
     "forever": "0.15.3",
@@ -37,6 +42,8 @@
     "npm-check-updates": "2.14.0",
     "passport": "0.4.0",
     "passport-facebook": "2.1.1",
+    "pre-commit": "1.2.2",
+    "prettier": "1.9.2",
     "sequelize": "4.28.6",
     "sequelize-cli": "3.2.0",
     "uuid": "3.1.0"
