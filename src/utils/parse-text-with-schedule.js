@@ -15,40 +15,11 @@ const MONTH_LIST = [
   'December',
 ];
 
-const MONTH_SHORT_LIST = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
+const MONTH_SHORT_LIST = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-const DAY_LIST = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-];
+const DAY_LIST = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-const DAY_SHORT_LIST = [
-  'Sun',
-  'Mon',
-  'Tue',
-  'Wed',
-  'Thu',
-  'Fri',
-  'Sat',
-];
+const DAY_SHORT_LIST = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function getDay(dateText) {
   const _day = dateText.replace(/(this|next)/i, '').trim();
@@ -98,9 +69,7 @@ function splitTextToDateAndText(text) {
   const resultTomorrow = text.match(/^tomorrow\s/i);
   const resultThis = text.match(/^this ([A-Z]{3}|[A-Z]{3,6}day)\s/i);
   const resultNext = text.match(/^next ([A-Z]{3}|[A-Z]{3,6}day)\s/i);
-  const resultDate = text.match(
-    /^([0-9]{1,2}\/[0-9]{1,2}|[0-9]{2,4}\/[0-9]{1,2}\/[0-9]{2,4}|[0-9]{4})\s/
-  );
+  const resultDate = text.match(/^([0-9]{1,2}\/[0-9]{1,2}|[0-9]{2,4}\/[0-9]{1,2}\/[0-9]{2,4}|[0-9]{4})\s/);
   const resultDay = text.match(/^([A-Z]{3}|[A-Z]{3,6}day)\s/i);
 
   if (resultToday) {
@@ -151,7 +120,9 @@ function textToSchedule(dateText, referenceDate) {
       // Next week
       _dayNum = getDayNum(dateText);
       if (_dayNum !== -1) {
-        date = moment(referenceDate).day(_dayNum).add(7, 'days');
+        date = moment(referenceDate)
+          .day(_dayNum)
+          .add(7, 'days');
       }
     } else if (dateText.match(/\//)) {
       // Date
@@ -198,7 +169,7 @@ function parseTextWithSchedule(text, referenceDate) {
   const _referenceDate = moment(referenceDate);
   const splitedItem = splitTextToDateAndText(text);
   const schedule = textToSchedule(splitedItem.date, _referenceDate) || null;
-  const item = (schedule) ? {schedule, text: splitedItem.text} : {schedule, text};
+  const item = schedule ? { schedule, text: splitedItem.text } : { schedule, text };
 
   return item;
 }

@@ -1,4 +1,4 @@
-const {Label} = require('../models');
+const { Label } = require('../models');
 
 function _transformLabel(label) {
   return {
@@ -16,7 +16,7 @@ function indexLabelHandler(req, res) {
   const userId = req.user.id;
 
   Label.findAllFromStatus({
-    where: {userId},
+    where: { userId },
     order: [['priority', 'ASC']],
   }).then(labels => {
     res.json(labels.map(_transformLabel));
@@ -27,11 +27,13 @@ function createLabelHandler(req, res) {
   const userId = req.user.id;
   const name = req.body.name;
 
-  Label.createWithStatus({userId, name}).then(label => {
-    res.json(_transformLabel(label));
-  }).catch(err => {
-    res.status(400).send(err.message);
-  });
+  Label.createWithStatus({ userId, name })
+    .then(label => {
+      res.json(_transformLabel(label));
+    })
+    .catch(err => {
+      res.status(400).send(err.message);
+    });
 }
 
 function showLabelHandler(req, res) {
@@ -49,7 +51,7 @@ function updateLabelHandler(req, res) {
   const name = req.body.name;
   const visibled = req.body.visibled;
 
-  Label.updateWithStatus(labelId, userId, {name, visibled}).then(label => {
+  Label.updateWithStatus(labelId, userId, { name, visibled }).then(label => {
     res.json(_transformLabel(label));
   });
 }

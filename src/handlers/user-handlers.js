@@ -1,15 +1,16 @@
-const {Op} = require('sequelize');
-const {errorMessages} = require('../constants');
-const {User, Request, LabelStatus} = require('../models');
+/* eslint no-irregular-whitespace: ["error", { "skipRegExps": true }] */
+const { Op } = require('sequelize');
+const { errorMessages } = require('../constants');
+const { User, Request, LabelStatus } = require('../models');
 
 function parseQueryForSequelizeWhere(q = '', fields = []) {
-  const keywords = q.split(/(\ |　)/).filter(str => (str !== ' ' && str !== '　'));
+  const keywords = q.split(/( |　)/).filter(str => str !== ' ' && str !== '　');
   const query = {};
   for (let i = 0; i < fields.length; i++) {
-    query[fields[i]] = {[Op.or]: keywords};
+    query[fields[i]] = { [Op.or]: keywords };
   }
 
-  return {[Op.or]: query};
+  return { [Op.or]: query };
 }
 
 function _transformUser(user) {
@@ -26,7 +27,7 @@ function searchUsersHandler(req, res) {
   const query = req.query;
   const where = parseQueryForSequelizeWhere(query.q, ['name', 'email']);
 
-  User.findAll({where}).then(users => {
+  User.findAll({ where }).then(users => {
     res.json(users.map(_transformUser));
   });
 }
@@ -47,22 +48,27 @@ function updateUserHandler(req, res) {
   const user = req.user || null;
   const name = req.body.name;
 
-  User.update({name}, {
-    where: {id: user.id},
-    individualHooks: true,
-  }).spread((count, users) => {
-    const user_ = users[0].dataValues;
-    res.json(_transformUser(user_));
-  }).catch(err => {
-    let code = 500;
-    let message = errorMessages.UNKNOWN_ERROR;
+  User.update(
+    { name },
+    {
+      where: { id: user.id },
+      individualHooks: true,
+    },
+  )
+    .spread((count, users) => {
+      const user_ = users[0].dataValues;
+      res.json(_transformUser(user_));
+    })
+    .catch(err => {
+      let code = 500;
+      let message = errorMessages.UNKNOWN_ERROR;
 
-    if (err.errors && err.errors[0].message === 'name must be unique') {
-      code = 400;
-      message = errorMessages.ALREADY_EXISTED_USER;
-    }
-    res.status(code).json({message});
-  });
+      if (err.errors && err.errors[0].message === 'name must be unique') {
+        code = 400;
+        message = errorMessages.ALREADY_EXISTED_USER;
+      }
+      res.status(code).json({ message });
+    });
 }
 
 function destroyUserHandler(req, res) {
@@ -71,7 +77,7 @@ function destroyUserHandler(req, res) {
   // Leave: Label, Request, Task
   // Remove: LabelStatus
   LabelStatus.destroy({
-    where: {userId},
+    where: { userId },
   }).then(() => {
     User.destroy({
       where: {
@@ -104,10 +110,13 @@ function indexMemberHandler(req, res) {
     const recievedRequests = values[1];
     const userIds = sentRequests.map(request => request.memberId);
     const memberIds = recievedRequests.map(request => request.userId);
-    const allIds = userIds.concat(memberIds).filter(id => id !== user.id).filter((x, i, self) => self.indexOf(x) === i);
+    const allIds = userIds
+      .concat(memberIds)
+      .filter(id => id !== user.id)
+      .filter((x, i, self) => self.indexOf(x) === i);
 
     User.findAll({
-      where: {id: allIds},
+      where: { id: allIds },
     }).then(users => {
       res.json(users.map(_transformUser));
     });

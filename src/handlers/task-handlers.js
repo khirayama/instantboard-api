@@ -1,10 +1,10 @@
 const Sequelize = require('sequelize');
-const {Label, Task} = require('../models');
-const {parseTextWithSchedule} = require('../utils/parse-text-with-schedule');
+const { Label, Task } = require('../models');
+const { parseTextWithSchedule } = require('../utils/parse-text-with-schedule');
 
 function _transformTask(task, label) {
   const task_ = task.dataValues || task;
-  const {schedule, text} = parseTextWithSchedule(task_.content, new Date(task_.createdAt));
+  const { schedule, text } = parseTextWithSchedule(task_.content, new Date(task_.createdAt));
   return {
     id: task_.id,
     label: {
@@ -26,11 +26,11 @@ function _transformTask(task, label) {
 function _indexTask(userId) {
   return new Promise(resolve => {
     Label.findAllFromStatus({
-      where: {userId},
+      where: { userId },
     }).then(labels => {
       const labelIds = labels.map(label => label.id);
       Task.findAll({
-        where: {labelId: labelIds},
+        where: { labelId: labelIds },
         order: [['priority', 'ASC']],
       }).then(tasks => {
         const formattedTasks = tasks.map(task => {
@@ -94,7 +94,7 @@ function updateTaskHandler(req, res) {
     if (labelId && String(labelId) !== String(task.labelId)) {
       Promise.all([
         Task.count({
-          where: {labelId},
+          where: { labelId },
         }),
         Task.findAll({
           where: {
@@ -109,29 +109,33 @@ function updateTaskHandler(req, res) {
         const tasks = values[1];
 
         tasks.forEach(task_ => {
-          task_.update({priority: task_.priority - 1});
+          task_.update({ priority: task_.priority - 1 });
         });
 
-        task.update({
-          labelId: (labelId === undefined) ? task.labelId : labelId,
-          content: (content === undefined) ? task.content : content,
-          completed: (completed === undefined) ? task.completed : completed,
-          priority: count,
-        }).then(task_ => {
+        task
+          .update({
+            labelId: labelId === undefined ? task.labelId : labelId,
+            content: content === undefined ? task.content : content,
+            completed: completed === undefined ? task.completed : completed,
+            priority: count,
+          })
+          .then(task_ => {
+            Label.findByIdAndUser(task_.labelId, userId).then(label => {
+              res.json(_transformTask(task_, label));
+            });
+          });
+      });
+    } else {
+      task
+        .update({
+          content: content === undefined ? task.content : content,
+          completed: completed === undefined ? task.completed : completed,
+        })
+        .then(task_ => {
           Label.findByIdAndUser(task_.labelId, userId).then(label => {
             res.json(_transformTask(task_, label));
           });
         });
-      });
-    } else {
-      task.update({
-        content: (content === undefined) ? task.content : content,
-        completed: (completed === undefined) ? task.completed : completed,
-      }).then(task_ => {
-        Label.findByIdAndUser(task_.labelId, userId).then(label => {
-          res.json(_transformTask(task_, label));
-        });
-      });
     }
   });
 }
@@ -150,7 +154,7 @@ function destroyTaskHandler(req, res) {
       },
     }).then(tasks => {
       tasks.forEach(task_ => {
-        task_.update({priority: task_.priority - 1});
+        task_.update({ priority: task_.priority - 1 });
       });
     });
 
@@ -179,9 +183,9 @@ function sortTaskHandler(req, res) {
         },
       }).then(tasks => {
         tasks.forEach(task_ => {
-          task_.update({priority: task_.priority - 1});
+          task_.update({ priority: task_.priority - 1 });
         });
-        task.update({priority}).then(() => {
+        task.update({ priority }).then(() => {
           _indexTask(userId).then(tasks => {
             res.json(tasks);
           });
@@ -198,9 +202,9 @@ function sortTaskHandler(req, res) {
         },
       }).then(tasks => {
         tasks.forEach(task_ => {
-          task_.update({priority: task_.priority + 1});
+          task_.update({ priority: task_.priority + 1 });
         });
-        task.update({priority}).then(() => {
+        task.update({ priority }).then(() => {
           _indexTask(userId).then(tasks => {
             res.json(tasks);
           });

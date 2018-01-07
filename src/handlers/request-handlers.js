@@ -1,4 +1,4 @@
-const {Request, User, Label} = require('../models');
+const { Request, User, Label } = require('../models');
 
 function _transformRequest(request) {
   return {
@@ -29,10 +29,10 @@ function indexRequestHandler(req, res) {
   }).then(requests => {
     Promise.all([
       User.findAll({
-        where: {id: requests.map(request => request.userId)},
+        where: { id: requests.map(request => request.userId) },
       }),
       Label.findAll({
-        where: {id: requests.map(request => request.labelId)},
+        where: { id: requests.map(request => request.labelId) },
       }),
     ]).then(values => {
       const users = values[0];
@@ -95,37 +95,36 @@ function createRequestHandler(req, res) {
       where: {
         name: memberName,
       },
-    }).then(user => {
-      Request.findOrCreate({
-        where: {
-          userId,
-          labelId,
-          memberId: user.id,
-          status: ['pending', 'accepted'],
-        },
-        defaults: {
-          userId,
-          labelId,
-          memberId: user.id,
-          status: 'pending',
-        },
-      }).spread(request => {
-        Promise.all([
-          Label.findById(request.labelId),
-          User.findById(request.memberId),
-        ]).then(res_ => {
-          const label = res_[0];
-          const member = res_[1];
-          request.member = member;
-          request.label = label;
-          res.json(_transformRequest(request));
+    })
+      .then(user => {
+        Request.findOrCreate({
+          where: {
+            userId,
+            labelId,
+            memberId: user.id,
+            status: ['pending', 'accepted'],
+          },
+          defaults: {
+            userId,
+            labelId,
+            memberId: user.id,
+            status: 'pending',
+          },
+        }).spread(request => {
+          Promise.all([Label.findById(request.labelId), User.findById(request.memberId)]).then(res_ => {
+            const label = res_[0];
+            const member = res_[1];
+            request.member = member;
+            request.label = label;
+            res.json(_transformRequest(request));
+          });
+        });
+      })
+      .catch(() => {
+        res.status(400).send({
+          error: 'No existed user.',
         });
       });
-    }).catch(() => {
-      res.status(400).send({
-        error: 'No existed user.',
-      });
-    });
   }
 }
 
@@ -136,13 +135,10 @@ function updateRequestHandler(req, res) {
   switch (status) {
     case 'accepted': {
       Request.acceptOne({
-        where: {id: requestId},
+        where: { id: requestId },
         individualHooks: true,
       }).then(request => {
-        Promise.all([
-          Label.findById(request.labelId),
-          User.findById(request.memberId),
-        ]).then(res_ => {
+        Promise.all([Label.findById(request.labelId), User.findById(request.memberId)]).then(res_ => {
           const label = res_[0];
           const member = res_[1];
           request.member = member;
@@ -153,14 +149,14 @@ function updateRequestHandler(req, res) {
       break;
     }
     default: {
-      Request.update({status}, {
-        where: {id: requestId},
-        individualHooks: true,
-      }).then(request => {
-        Promise.all([
-          Label.findById(request.labelId),
-          User.findById(request.memberId),
-        ]).then(res_ => {
+      Request.update(
+        { status },
+        {
+          where: { id: requestId },
+          individualHooks: true,
+        },
+      ).then(request => {
+        Promise.all([Label.findById(request.labelId), User.findById(request.memberId)]).then(res_ => {
           const label = res_[0];
           const member = res_[1];
           request.member = member;
@@ -177,7 +173,7 @@ function destroyRequestHandler(req, res) {
   const requestId = req.params.id;
 
   Request.destroy({
-    where: {id: requestId},
+    where: { id: requestId },
   }).then(request => {
     res.json(_transformRequest(request));
   });
