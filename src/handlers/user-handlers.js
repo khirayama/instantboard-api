@@ -18,6 +18,7 @@ function _transformUser(user) {
     id: user.id,
     name: user.name,
     email: user.email,
+    imageUrl: user.imageUrl,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
