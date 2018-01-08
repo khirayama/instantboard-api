@@ -6,6 +6,8 @@ function _transformRequest(request) {
     member: {
       id: request.member.id,
       name: request.member.name,
+      email: request.member.email,
+      imageUrl: request.member.imageUrl,
     },
     label: {
       id: request.label.id,
@@ -50,6 +52,8 @@ function indexRequestHandler(req, res) {
             request_.member = {
               id: user.id,
               name: user.name,
+              email: user.email,
+              imageUrl: user.imageUrl,
             };
           }
         });

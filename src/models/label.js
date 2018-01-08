@@ -14,6 +14,8 @@ function _getRequests(label, requests, users) {
             member: {
               id: user.id,
               name: user.name,
+              email: user.email,
+              imageUrl: user.imageUrl,
             },
           });
         }
