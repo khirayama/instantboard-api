@@ -17,12 +17,12 @@
     "lint": "eslint --fix --ignore-path .gitignore src test",
     "format": "prettier --ignore-path .gitignore --config .prettierrc --write 'src/**/*'",
     "check": "npm-check-updates",
+    "precommit": "npm run lint && npm run check",
     "test": "NODE_ENV=test ava test/**/*.test.js",
     "test:watch": "NODE_ENV=test ava -w test/**/*.test.js"
   },
   "pre-commit": [
-    "lint",
-    "format"
+    "precommit"
   ],
   "dependencies": {
     "ajv": "6.0.1",
