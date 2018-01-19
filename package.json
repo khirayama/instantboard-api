@@ -46,7 +46,7 @@
     "prettier": "1.10.2",
     "sequelize": "4.31.2",
     "sequelize-cli": "3.2.0",
-    "uuid": "3.1.0"
+    "uuid": "3.2.1"
   },
   "ava": {
     "files": [
