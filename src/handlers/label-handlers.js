@@ -6,7 +6,16 @@ function _transformLabel(label) {
     name: label.name,
     priority: label.priority,
     visibled: label.visibled,
-    requests: label.requests,
+    members: label.requests.map(request => {
+      return {
+        id: request.member.id,
+        name: request.member.name,
+        email: request.member.email,
+        imageUrl: request.member.imageUrl,
+        requestId: request.id,
+        status: request.status,
+      };
+    }),
     createdAt: label.createdAt,
     updatedAt: label.updatedAt,
   };

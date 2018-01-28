@@ -185,7 +185,8 @@ router.use(
         new express.Router()
           .get('/', [requireAuthorization], showUserHandler)
           .put('/', [requireAuthorization], updateUserHandler)
-          .delete('/', [requireAuthorization], destroyUserHandler),
+          .delete('/', [requireAuthorization], destroyUserHandler)
+          .use('/members', new express.Router().get('/', [requireAuthorization], indexMemberHandler))
       )
       .use(
         '/tasks',
@@ -215,7 +216,6 @@ router.use(
           .put('/:id', [requireAuthorization], updateRequestHandler)
           .delete('/:id', [requireAuthorization], destroyRequestHandler),
       )
-      .use('/members', new express.Router().get('/', [requireAuthorization], indexMemberHandler))
       .use('/search', new express.Router().get('/users', [requireAuthorization], searchUsersHandler)),
   ),
 );
