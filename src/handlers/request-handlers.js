@@ -76,60 +76,30 @@ function createRequestHandler(req, res) {
   const userId = req.user.id;
   const labelId = req.body.labelId;
   const memberId = req.body.memberId || null;
-  const memberName = req.body.memberName || null;
 
-  if (memberId) {
-    Request.findOrCreate({
-      where: {
-        userId,
-        labelId,
-        memberId,
-        status: ['pending', 'accepted'],
-      },
-      defaults: {
-        userId,
-        labelId,
-        memberId,
-      },
-    }).then(request => {
-      res.json(_transformRequest(request[0]));
+  Request.findOrCreate({
+    where: {
+      userId,
+      labelId,
+      memberId,
+      status: ['pending', 'accepted'],
+    },
+    defaults: {
+      userId,
+      labelId,
+      memberId,
+      status: 'pending',
+    },
+  }).spread((rawRequest) => {
+    const request = rawRequest.dataValues;
+    Promise.all([Label.findById(request.labelId), User.findById(request.memberId)]).then(res_ => {
+      const label = res_[0];
+      const member = res_[1];
+      request.member = member;
+      request.label = label;
+      res.json(_transformRequest(request));
     });
-  } else if (memberName) {
-    User.findOne({
-      where: {
-        name: memberName,
-      },
-    })
-      .then(user => {
-        Request.findOrCreate({
-          where: {
-            userId,
-            labelId,
-            memberId: user.id,
-            status: ['pending', 'accepted'],
-          },
-          defaults: {
-            userId,
-            labelId,
-            memberId: user.id,
-            status: 'pending',
-          },
-        }).spread(request => {
-          Promise.all([Label.findById(request.labelId), User.findById(request.memberId)]).then(res_ => {
-            const label = res_[0];
-            const member = res_[1];
-            request.member = member;
-            request.label = label;
-            res.json(_transformRequest(request));
-          });
-        });
-      })
-      .catch(() => {
-        res.status(400).send({
-          error: 'No existed user.',
-        });
-      });
-  }
+  });
 }
 
 function updateRequestHandler(req, res) {
@@ -179,7 +149,13 @@ function destroyRequestHandler(req, res) {
   Request.destroy({
     where: { id: requestId },
   }).then(request => {
-    res.json(_transformRequest(request));
+    Promise.all([Label.findById(request.labelId), User.findById(request.memberId)]).then(res_ => {
+      const label = res_[0];
+      const member = res_[1];
+      request.member = member;
+      request.label = label;
+      res.json(_transformRequest(request));
+    });
   });
 }
 
