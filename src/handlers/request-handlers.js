@@ -146,15 +146,19 @@ function updateRequestHandler(req, res) {
 function destroyRequestHandler(req, res) {
   const requestId = req.params.id;
 
-  Request.destroy({
-    where: { id: requestId },
-  }).then(request => {
-    Promise.all([Label.findById(request.labelId), User.findById(request.memberId)]).then(res_ => {
-      const label = res_[0];
-      const member = res_[1];
-      request.member = member;
-      request.label = label;
-      res.json(_transformRequest(request));
+  Request.findById(requestId).then(request => {
+    Request.destroy({
+      where: {
+        id: requestId,
+      },
+    }).then(() => {
+      Promise.all([Label.findById(request.labelId), User.findById(request.memberId)]).then(res_ => {
+        const label = res_[0];
+        const member = res_[1];
+        request.member = member;
+        request.label = label;
+        res.json(_transformRequest(request));
+      });
     });
   });
 }
