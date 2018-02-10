@@ -14,7 +14,6 @@ const { extractAccessTokenFromHeader, checkAccessToken } = require('./utils');
 const {
   searchUsersHandler,
   showUserHandler,
-  updateUserHandler,
   destroyUserHandler,
   indexMemberHandler,
 } = require('./handlers/user-handlers');
@@ -184,7 +183,6 @@ router.use(
         '/user',
         new express.Router()
           .get('/', [requireAuthorization], showUserHandler)
-          .put('/', [requireAuthorization], updateUserHandler)
           .delete('/', [requireAuthorization], destroyUserHandler)
           .use('/members', new express.Router().get('/', [requireAuthorization], indexMemberHandler))
       )

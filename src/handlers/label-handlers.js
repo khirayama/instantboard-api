@@ -10,7 +10,6 @@ function _transformLabel(label) {
       return {
         id: request.member.id,
         name: request.member.name,
-        email: request.member.email,
         imageUrl: request.member.imageUrl,
         requestId: request.id,
         status: request.status,

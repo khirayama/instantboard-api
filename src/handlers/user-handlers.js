@@ -24,12 +24,22 @@ function _transformUser(user) {
   };
 }
 
+function _transformMember(user) {
+  return {
+    id: user.id,
+    name: user.name,
+    imageUrl: user.imageUrl,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+}
+
 function searchUsersHandler(req, res) {
   const query = req.query;
   const where = parseQueryForSequelizeWhere(query.q, ['name', 'email']);
 
   User.findAll({ where }).then(users => {
-    res.json(users.map(_transformUser));
+    res.json(users.map(_transformMember));
   });
 }
 
@@ -43,33 +53,6 @@ function showUserHandler(req, res) {
     return;
   }
   res.json(_transformUser(req.user));
-}
-
-function updateUserHandler(req, res) {
-  const user = req.user || null;
-  const name = req.body.name;
-
-  User.update(
-    { name },
-    {
-      where: { id: user.id },
-      individualHooks: true,
-    },
-  )
-    .spread((count, users) => {
-      const user_ = users[0].dataValues;
-      res.json(_transformUser(user_));
-    })
-    .catch(err => {
-      let code = 500;
-      let message = errorMessages.UNKNOWN_ERROR;
-
-      if (err.errors && err.errors[0].message === 'name must be unique') {
-        code = 400;
-        message = errorMessages.ALREADY_EXISTED_USER;
-      }
-      res.status(code).json({ message });
-    });
 }
 
 function destroyUserHandler(req, res) {
@@ -119,7 +102,7 @@ function indexMemberHandler(req, res) {
     User.findAll({
       where: { id: allIds },
     }).then(users => {
-      res.json(users.map(_transformUser));
+      res.json(users.map(_transformMember));
     });
   });
 }
@@ -127,7 +110,6 @@ function indexMemberHandler(req, res) {
 module.exports = {
   searchUsersHandler,
   showUserHandler,
-  updateUserHandler,
   destroyUserHandler,
   indexMemberHandler,
 };
