@@ -63,288 +63,230 @@ module.exports = (sequelize, DataTypes) => {
   // public static destroyByUser
   // public static sort
 
-  Label.findAllFromStatus = function(options = {}) {
+  Label.findAllFromStatus = async function(options = {}) {
     const LabelStatus = sequelize.models.LabelStatus;
     const Request = sequelize.models.Request;
     const User = sequelize.models.User;
 
-    return new Promise(resolve => {
-      LabelStatus.findAll(options).then(labelStatuses => {
-        const labelIds = labelStatuses.map(labelStatus => labelStatus.labelId);
-        Promise.all([
-          Label.findAll({
-            where: { id: labelIds },
-          }),
-          Request.findAll({
-            where: { labelId: labelIds },
-          }),
-        ])
-          .then(values => {
-            const labels = values[0];
-            const requests = values[1];
+    const labelStatuses = await LabelStatus.findAll(options);
+    const labelIds = labelStatuses.map(labelStatus => labelStatus.labelId);
+    const values = await Promise.all([
+      Label.findAll({
+        where: { id: labelIds },
+      }),
+      Request.findAll({
+        where: { labelId: labelIds },
+      }),
+    ]);
+    const labels = values[0];
+    const requests = values[1];
 
-            const userIds = [].concat(
-              requests.map(request => request.memberId),
-              requests.map(request => request.userId),
-            );
-            User.findAll({
-              where: { id: userIds },
-            }).then(users => {
-              const labels_ = labelStatuses.map(labelStatus => {
-                let newLabel = {};
-                for (let i = 0; i < labels.length; i++) {
-                  const label = labels[i];
-                  if (label.id === labelStatus.labelId) {
-                    newLabel = {
-                      id: label.id,
-                      name: label.name,
-                      priority: labelStatus.priority,
-                      visibled: labelStatus.visibled,
-                      createdAt: label.createdAt,
-                      updatedAt: label.updatedAt,
-                      requests: _getRequests(label, requests, users),
-                    };
-                  }
-                }
-                return newLabel;
-              });
-              resolve(labels_);
-            });
-          })
-          .catch(err => console.log(err));
-      });
+    const userIds = [].concat(
+      requests.map(request => request.memberId),
+      requests.map(request => request.userId),
+    );
+    const users = await User.findAll({
+      where: { id: userIds },
     });
+    const labels_ = labelStatuses.map(labelStatus => {
+      let newLabel = {};
+      for (let i = 0; i < labels.length; i++) {
+        const label = labels[i];
+        if (label.id === labelStatus.labelId) {
+          newLabel = {
+            id: label.id,
+            name: label.name,
+            priority: labelStatus.priority,
+            visibled: labelStatus.visibled,
+            createdAt: label.createdAt,
+            updatedAt: label.updatedAt,
+            requests: _getRequests(label, requests, users),
+          };
+        }
+      }
+      return newLabel;
+    });
+    return labels_;
   };
 
-  Label.findByIdAndUser = function(labelId, userId) {
+  Label.findByIdAndUser = async function(labelId, userId) {
     const LabelStatus = sequelize.models.LabelStatus;
     const Request = sequelize.models.Request;
     const User = sequelize.models.User;
 
-    return new Promise(resolve => {
-      Promise.all([
-        Label.findById(labelId),
-        LabelStatus.findOne({
-          where: { userId, labelId },
-        }),
-        Request.findAll({
-          where: { labelId },
-        }),
-      ])
-        .then(values => {
-          const label = values[0];
-          const labelStatus = values[1];
-          const requests = values[2];
+    const values = await Promise.all([
+      Label.findById(labelId),
+      LabelStatus.findOne({
+        where: { userId, labelId },
+      }),
+      Request.findAll({
+        where: { labelId },
+      }),
+    ]);
+    const label = values[0];
+    const labelStatus = values[1];
+    const requests = values[2];
 
-          const userIds = [].concat(requests.map(request => request.memberId), requests.map(request => request.userId));
-          User.findAll({
-            where: { id: userIds },
-          })
-            .then(users => {
-              resolve({
-                id: label.id,
-                name: label.name,
-                priority: labelStatus.priority,
-                visibled: labelStatus.visibled,
-                createdAt: label.createdAt,
-                updatedAt: label.updatedAt,
-                requests: _getRequests(label, requests, users),
-              });
-            })
-            .catch(err => console.log(err));
-        })
-        .catch(err => console.log(err));
+    const userIds = [].concat(requests.map(request => request.memberId), requests.map(request => request.userId));
+    const users = await User.findAll({
+      where: { id: userIds },
     });
+    return {
+      id: label.id,
+      name: label.name,
+      priority: labelStatus.priority,
+      visibled: labelStatus.visibled,
+      createdAt: label.createdAt,
+      updatedAt: label.updatedAt,
+      requests: _getRequests(label, requests, users),
+    };
   };
 
-  Label.createWithStatus = function(values) {
+  Label.createWithStatus = async function(values) {
     // Property: userId, name
     const LabelStatus = sequelize.models.LabelStatus;
     const Request = sequelize.models.Request;
 
-    return new Promise(resolve => {
-      Promise.all([
-        Label.create({
+    const values_ = await Promise.all([
+      Label.create({
+        userId: values.userId,
+        name: values.name,
+      }),
+      LabelStatus.count({
+        where: {
           userId: values.userId,
-          name: values.name,
-        }),
-        LabelStatus.count({
-          where: {
-            userId: values.userId,
-          },
-        }),
-      ]).then(values_ => {
-        const label = values_[0];
-        const count = values_[1];
+        },
+      }),
+    ]);
+    const label = values_[0];
+    const count = values_[1];
 
-        LabelStatus.create({
-          userId: values.userId,
-          labelId: label.id,
-          priority: count,
-          visibled: true,
-        }).then(() => {
-          Label.findByIdAndUser(label.id, values.userId).then(label_ => {
-            resolve(label_);
-          });
-        });
-        Request.create({
-          userId: values.userId,
-          memberId: values.userId,
-          labelId: label.id,
-          status: 'accepted',
-        });
-      });
+    await LabelStatus.create({
+      userId: values.userId,
+      labelId: label.id,
+      priority: count,
+      visibled: true,
     });
+    const label_ = await Label.findByIdAndUser(label.id, values.userId);
+    await Request.create({
+      userId: values.userId,
+      memberId: values.userId,
+      labelId: label.id,
+      status: 'accepted',
+    });
+    return label_;
   };
 
-  Label.updateWithStatus = function(labelId, userId, values) {
+  Label.updateWithStatus = async function(labelId, userId, values) {
     const LabelStatus = sequelize.models.LabelStatus;
 
-    return new Promise(resolve => {
-      Promise.all([Label.findById(labelId), LabelStatus.findOne({ where: { userId, labelId } })]).then(values_ => {
-        const label = values_[0];
-        const labelStatus = values_[1];
+    const values_ = await Promise.all([Label.findById(labelId), LabelStatus.findOne({ where: { userId, labelId } })]);
+    const label = values_[0];
+    const labelStatus = values_[1];
 
-        Promise.all([
-          label.update({
-            name: values.name === undefined ? label.name : values.name,
-          }),
-          labelStatus.update({
-            visibled: values.visibled === undefined ? labelStatus.visibled : values.visibled,
-          }),
-        ]).then(() => {
-          Label.findByIdAndUser(labelId, userId).then(label => {
-            resolve(label);
-          });
-        });
-      });
-    });
+    await Promise.all([
+      label.update({
+        name: values.name === undefined ? label.name : values.name,
+      }),
+      labelStatus.update({
+        visibled: values.visibled === undefined ? labelStatus.visibled : values.visibled,
+      }),
+    ]);
+    const label_ = await Label.findByIdAndUser(labelId, userId);
+    return label_;
   };
 
-  Label.destroyByUser = function(labelId, userId) {
+  Label.destroyByUser = async function(labelId, userId) {
     const LabelStatus = sequelize.models.LabelStatus;
     const Task = sequelize.models.Task;
     const Request = sequelize.models.Request;
 
-    return new Promise(resolve => {
-      Label.findByIdAndUser(labelId, userId)
-        .then(cachedLabel => {
-          LabelStatus.findAll({
-            where: {
-              userId,
-              priority: {
-                [Sequelize.Op.gt]: cachedLabel.priority,
-              },
-            },
-          })
-            .then(labelStatuses => {
-              labelStatuses.forEach(labelStatus => {
-                labelStatus.update({ priority: labelStatus.priority - 1 });
-              });
-            })
-            .catch(err => console.log(err));
-          LabelStatus.destroy({
-            where: { labelId, userId },
-          })
-            .then(() => {
-              LabelStatus.count({
-                where: { labelId },
-              })
-                .then(count => {
-                  if (count === 0) {
-                    // If destroy label, remove request and task
-                    Label.destroy({
-                      where: { id: labelId },
-                    })
-                      .then(() => {
-                        Promise.all([
-                          Request.destroy({
-                            where: { labelId },
-                          }),
-                          Task.destroy({
-                            where: { labelId },
-                          }),
-                        ])
-                          .then(() => {
-                            resolve(cachedLabel);
-                          })
-                          .catch(err => console.log(err));
-                      })
-                      .catch(err => console.log(err));
-                  } else {
-                    // If don't destroy label, remove request
-                    Request.destroy({
-                      where: { labelId, memberId: userId },
-                    })
-                      .then(() => {
-                        resolve(cachedLabel);
-                      })
-                      .catch(err => console.log(err));
-                  }
-                })
-                .catch(err => console.log(err));
-            })
-            .catch(err => console.log(err));
-        })
-        .catch(err => console.log(err));
-    }).catch(err => console.log(err));
+    const cachedLabel = await Label.findByIdAndUser(labelId, userId);
+    const labelStatuses = await LabelStatus.findAll({
+      where: {
+        userId,
+        priority: {
+          [Sequelize.Op.gt]: cachedLabel.priority,
+        },
+      },
+    });
+    labelStatuses.forEach(labelStatus => {
+      labelStatus.update({ priority: labelStatus.priority - 1 });
+    });
+    await LabelStatus.destroy({
+      where: { labelId, userId },
+    });
+    const count = await LabelStatus.count({
+      where: { labelId },
+    });
+    if (count === 0) {
+      // If destroy label, remove request and task
+      await Label.destroy({
+        where: { id: labelId },
+      })
+      await Promise.all([
+        Request.destroy({
+          where: { labelId },
+        }),
+        Task.destroy({
+          where: { labelId },
+        }),
+      ]);
+      return cachedLabel;
+    }
+    // If don't destroy label, remove request
+    await Request.destroy({
+      where: { labelId, memberId: userId },
+    })
+    return cachedLabel;
   };
 
-  Label.sort = function(labelId, userId, priority) {
+  Label.sort = async function(labelId, userId, priority) {
     const LabelStatus = sequelize.models.LabelStatus;
 
-    return new Promise(resolve => {
-      LabelStatus.findOne({
-        where: { userId, labelId },
-      }).then(labelStatus => {
-        if (labelStatus.priority < priority) {
-          LabelStatus.findAll({
-            where: {
-              userId,
-              priority: {
-                [Sequelize.Op.gt]: labelStatus.priority,
-                [Sequelize.Op.lte]: priority,
-              },
-            },
-          }).then(labelStatuses => {
-            labelStatuses.forEach(labelStatus_ => {
-              labelStatus_.update({ priority: labelStatus_.priority - 1 });
-            });
-            labelStatus.update({ priority }).then(() => {
-              Label.findAllFromStatus({
-                where: { userId },
-                order: [['priority', 'ASC']],
-              }).then(labels => {
-                resolve(labels);
-              });
-            });
-          });
-        } else if (labelStatus.priority > priority) {
-          LabelStatus.findAll({
-            where: {
-              userId,
-              priority: {
-                [Sequelize.Op.gte]: priority,
-                [Sequelize.Op.lt]: labelStatus.priority,
-              },
-            },
-          }).then(labelStatuses => {
-            labelStatuses.forEach(labelStatus_ => {
-              labelStatus_.update({ priority: labelStatus_.priority + 1 });
-            });
-            labelStatus.update({ priority }).then(() => {
-              Label.findAllFromStatus({
-                where: { userId },
-                order: [['priority', 'ASC']],
-              }).then(labels => {
-                resolve(labels);
-              });
-            });
-          });
-        }
-      });
+    const labelStatus = await LabelStatus.findOne({
+      where: { userId, labelId },
     });
+    if (labelStatus.priority < priority) {
+      const labelStatuses = await LabelStatus.findAll({
+        where: {
+          userId,
+          priority: {
+            [Sequelize.Op.gt]: labelStatus.priority,
+            [Sequelize.Op.lte]: priority,
+          },
+        },
+      });
+      labelStatuses.forEach(labelStatus_ => {
+        labelStatus_.update({ priority: labelStatus_.priority - 1 });
+      });
+      await labelStatus.update({ priority });
+      const labels = await Label.findAllFromStatus({
+        where: { userId },
+        order: [['priority', 'ASC']],
+      });
+      return labels;
+    } else if (labelStatus.priority > priority) {
+      const labelStatuses = await LabelStatus.findAll({
+        where: {
+          userId,
+          priority: {
+            [Sequelize.Op.gte]: priority,
+            [Sequelize.Op.lt]: labelStatus.priority,
+          },
+        },
+      });
+      labelStatuses.forEach(labelStatus_ => {
+        labelStatus_.update({ priority: labelStatus_.priority + 1 });
+      });
+      await labelStatus.update({ priority });
+      const labels = await Label.findAllFromStatus({
+        where: { userId },
+        order: [['priority', 'ASC']],
+      });
+      return labels;
+    }
   };
 
   return Label;
-};
+}
