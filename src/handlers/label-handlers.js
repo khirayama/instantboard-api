@@ -60,7 +60,7 @@ async function destroyLabelHandler(req, res) {
   const userId = req.user.id;
   const labelId = req.params.id;
 
-  const label = Label.destroyByUser(labelId, userId);
+  const label = await Label.destroyByUser(labelId, userId);
   res.json(_transformLabel(label));
 }
 
@@ -69,7 +69,7 @@ async function sortLabelHandler(req, res) {
   const labelId = req.params.id;
   const priority = req.body.priority;
 
-  const labels = Label.sort(labelId, userId, priority);
+  const labels = await Label.sort(labelId, userId, priority);
   res.json(labels.map(_transformLabel));
 }
 
