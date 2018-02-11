@@ -20,67 +20,57 @@ function _transformLabel(label) {
   };
 }
 
-function indexLabelHandler(req, res) {
+async function indexLabelHandler(req, res) {
   const userId = req.user.id;
 
-  Label.findAllFromStatus({
+  const labels = await Label.findAllFromStatus({
     where: { userId },
     order: [['priority', 'ASC']],
-  }).then(labels => {
-    res.json(labels.map(_transformLabel));
   });
+  res.json(labels.map(_transformLabel));
 }
 
-function createLabelHandler(req, res) {
+async function createLabelHandler(req, res) {
   const userId = req.user.id;
   const name = req.body.name;
 
-  Label.createWithStatus({ userId, name })
-    .then(label => {
-      res.json(_transformLabel(label));
-    })
-    .catch(err => {
-      res.status(400).send(err.message);
-    });
+  const label = await Label.createWithStatus({ userId, name });
+  res.json(_transformLabel(label));
 }
 
-function showLabelHandler(req, res) {
+async function showLabelHandler(req, res) {
   const userId = req.user.id;
   const labelId = req.params.id;
 
-  Label.findByIdAndUser(labelId, userId).then(label => {
-    res.json(_transformLabel(label));
-  });
+  const label = await Label.findByIdAndUser(labelId, userId);
+  res.json(_transformLabel(label));
 }
 
-function updateLabelHandler(req, res) {
+async function updateLabelHandler(req, res) {
   const userId = req.user.id;
   const labelId = req.params.id;
   const name = req.body.name;
   const visibled = req.body.visibled;
 
-  Label.updateWithStatus(labelId, userId, { name, visibled }).then(label => {
-    res.json(_transformLabel(label));
-  });
+  const label = await Label.updateWithStatus(labelId, userId, { name, visibled });
+  res.json(_transformLabel(label));
 }
 
-function destroyLabelHandler(req, res) {
+async function destroyLabelHandler(req, res) {
   const userId = req.user.id;
   const labelId = req.params.id;
 
-  Label.destroyByUser(labelId, userId).then(label => {
-    res.json(_transformLabel(label));
-  });
+  const label = Label.destroyByUser(labelId, userId);
+  res.json(_transformLabel(label));
 }
 
-function sortLabelHandler(req, res) {
+async function sortLabelHandler(req, res) {
   const userId = req.user.id;
   const labelId = req.params.id;
   const priority = req.body.priority;
 
-  Label.sort(labelId, userId, priority).then(labels => {
-    res.json(labels.map(_transformLabel));
-  });
+  const labels = Label.sort(labelId, userId, priority);
+  res.json(labels.map(_transformLabel));
 }
 
 module.exports = {
