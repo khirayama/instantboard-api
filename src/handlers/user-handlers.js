@@ -34,16 +34,15 @@ function _transformMember(user) {
   };
 }
 
-function searchUsersHandler(req, res) {
+async function searchUsersHandler(req, res) {
   const query = req.query;
   const where = parseQueryForSequelizeWhere(query.q, ['name', 'email']);
 
-  User.findAll({ where }).then(users => {
-    res.json(users.map(_transformMember));
-  });
+  const users = await User.findAll({ where });
+  res.json(users.map(_transformMember));
 }
 
-function showUserHandler(req, res) {
+async function showUserHandler(req, res) {
   const user = req.user || null;
 
   if (user === null) {
@@ -55,28 +54,26 @@ function showUserHandler(req, res) {
   res.json(_transformUser(req.user));
 }
 
-function destroyUserHandler(req, res) {
+async function destroyUserHandler(req, res) {
   const userId = req.user.id;
 
   // Leave: Label, Request, Task
   // Remove: LabelStatus
-  LabelStatus.destroy({
+  await LabelStatus.destroy({
     where: { userId },
-  }).then(() => {
-    User.destroy({
-      where: {
-        id: userId,
-      },
-    }).then(() => {
-      res.json();
-    });
   });
+  await User.destroy({
+    where: {
+      id: userId,
+    },
+  });
+  res.json();
 }
 
-function indexMemberHandler(req, res) {
+async function indexMemberHandler(req, res) {
   const user = req.user || null;
 
-  Promise.all([
+  const values = await Promise.all([
     Request.findAll({
       where: {
         userId: user.id,
@@ -89,22 +86,20 @@ function indexMemberHandler(req, res) {
         status: 'accepted',
       },
     }),
-  ]).then(values => {
-    const sentRequests = values[0];
-    const recievedRequests = values[1];
-    const userIds = sentRequests.map(request => request.memberId);
-    const memberIds = recievedRequests.map(request => request.userId);
-    const allIds = userIds
-      .concat(memberIds)
-      .filter(id => id !== user.id)
-      .filter((x, i, self) => self.indexOf(x) === i);
+  ]);
+  const sentRequests = values[0];
+  const recievedRequests = values[1];
+  const userIds = sentRequests.map(request => request.memberId);
+  const memberIds = recievedRequests.map(request => request.userId);
+  const allIds = userIds
+    .concat(memberIds)
+    .filter(id => id !== user.id)
+    .filter((x, i, self) => self.indexOf(x) === i);
 
-    User.findAll({
-      where: { id: allIds },
-    }).then(users => {
-      res.json(users.map(_transformMember));
-    });
+  const users = await User.findAll({
+    where: { id: allIds },
   });
+  res.json(users.map(_transformMember));
 }
 
 module.exports = {
