@@ -266,7 +266,8 @@ module.exports = (sequelize, DataTypes) => {
         order: [['priority', 'ASC']],
       });
       return labels;
-    } else if (labelStatus.priority > priority) {
+    }
+    if (labelStatus.priority > priority) {
       const labelStatuses = await LabelStatus.findAll({
         where: {
           userId,

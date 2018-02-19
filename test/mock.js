@@ -3,9 +3,11 @@ class Response {
     this.code = null;
     this._listeners = [];
   }
+
   on(callback) {
     this._listeners.push(callback.bind(this));
   }
+
   _emit(res) {
     this._listeners.forEach(listener => {
       listener(res);
@@ -17,9 +19,11 @@ class Response {
     this.code = code;
     return this;
   }
+
   send(res) {
     this._emit(res);
   }
+
   json(res) {
     this._emit(res);
   }
