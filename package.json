@@ -34,7 +34,7 @@
     "mysql2": "1.5.2",
     "passport": "0.4.0",
     "passport-facebook": "2.1.1",
-    "sequelize": "4.35.2"
+    "sequelize": "4.36.0"
   },
   "devDependencies": {
     "ajv": "6.2.1",
