@@ -162,7 +162,7 @@ async function sortTaskHandler(req, res) {
       task_.update({ priority: task_.priority - 1 });
     });
     await task.update({ priority });
-    const tasks_ = _indexTask(userId);
+    const tasks_ = await _indexTask(userId);
     res.json(tasks_);
   } else if (task.priority > priority) {
     const tasks = await Task.findAll({
