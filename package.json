@@ -34,15 +34,15 @@
     "mysql2": "1.5.3",
     "passport": "0.4.0",
     "passport-facebook": "2.1.1",
-    "sequelize": "4.37.6"
+    "sequelize": "4.37.10"
   },
   "devDependencies": {
-    "ajv": "6.4.0",
+    "ajv": "6.5.0",
     "ava": "0.25.0",
     "eslint": "4.19.1",
     "eslint-config-prettier": "2.9.0",
     "eslint-config-xo-space": "0.18.0",
-    "nodemon": "1.17.3",
+    "nodemon": "1.17.5",
     "pre-commit": "1.2.2",
     "prettier": "1.12.1",
     "sequelize-cli": "4.0.0"
